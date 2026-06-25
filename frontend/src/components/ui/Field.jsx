@@ -13,6 +13,16 @@ export const Input = forwardRef(function Input({ label, error, className = '', .
   )
 })
 
+export const Textarea = forwardRef(function Textarea({ label, error, className = '', rows = 2, ...props }, ref) {
+  return (
+    <label className="block">
+      {label && <span className="mb-1 block text-sm font-medium text-slate-700">{label}</span>}
+      <textarea ref={ref} rows={rows} className={`${base} ${error ? 'border-red-400' : ''} ${className}`} {...props} />
+      {error && <span className="mt-1 block text-xs text-red-600">{error}</span>}
+    </label>
+  )
+})
+
 export const Select = forwardRef(function Select({ label, error, children, className = '', ...props }, ref) {
   return (
     <label className="block">

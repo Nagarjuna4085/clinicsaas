@@ -3,14 +3,16 @@ package com.clinicflow.entity.tenant;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
+/**
+ * Doctor's consultation notes for a visit (maps the `consultations` table).
+ * One per appointment.
+ */
 @Entity
-@Table(name = "prescriptions")
+@Table(name = "consultations")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
-public class Prescription {
+public class Consultation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -20,18 +22,17 @@ public class Prescription {
     @JoinColumn(name = "appointment_id")
     private Appointment appointment;
 
-    @OneToMany(mappedBy = "prescription", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    private List<PrescriptionItem> items = new ArrayList<>();
+    @Column(name = "chief_complaint", columnDefinition = "TEXT")
+    private String chiefComplaint;
 
-    @Column(name = "pdf_url", columnDefinition = "TEXT")
-    private String pdfUrl;
+    @Column(columnDefinition = "TEXT")
+    private String diagnosis;
 
-    @Column(name = "whatsapp_sent")
-    private boolean whatsappSent = false;
+    @Column(columnDefinition = "TEXT")
+    private String examination;
 
-    @Column(name = "whatsapp_sent_at")
-    private OffsetDateTime whatsappSentAt;
+    @Column(columnDefinition = "TEXT")
+    private String advice;
 
     @Builder.Default
     @Column(name = "created_at")

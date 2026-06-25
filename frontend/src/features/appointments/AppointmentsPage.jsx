@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { getTodayQueue, updateAppointmentStatus } from './api'
 import BookAppointmentModal from './BookAppointmentModal'
@@ -30,6 +31,7 @@ export default function AppointmentsPage() {
   const qc = useQueryClient()
   const role = useAuthStore((s) => s.role)
   const canBook = role === ROLES.ADMIN || role === ROLES.RECEPTIONIST
+  const canConsult = [ROLES.ADMIN, ROLES.DOCTOR, ROLES.NURSE].includes(role)
 
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ['appointments', 'today'],
@@ -103,7 +105,16 @@ export default function AppointmentsPage() {
                       <Badge color={statusColor[a.status]}>{a.status}</Badge>
                     </td>
                     <td className="px-3 py-2">
-                      <div className="flex justify-end gap-2">
+                      <div className="flex items-center justify-end gap-2">
+                        {canConsult && (
+                          <Link
+                            to={`/appointments/${a.id}/consult`}
+                            state={{ appointment: a }}
+                            className="rounded-lg px-2 py-1 text-sm font-medium text-brand-600 hover:bg-brand-50"
+                          >
+                            Consult
+                          </Link>
+                        )}
                         {nextActions[a.status]?.map(([status, label]) => (
                           <Button
                             key={status}

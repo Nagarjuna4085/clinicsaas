@@ -17,7 +17,7 @@ public class PrescriptionDto {
         LocalDate followupDate,
         List<ItemRequest> medicines
     ) {
-        record ItemRequest(
+        public record ItemRequest(
             @NotBlank String medicineName,
             String dosage,
             String frequency,
@@ -28,11 +28,16 @@ public class PrescriptionDto {
 
     public record Response(
         UUID id,
+        String chiefComplaint,
+        String diagnosis,
+        String examination,
+        String advice,
+        LocalDate followupDate,
         String pdfUrl,
         boolean whatsappSent,
         List<ItemResponse> medicines
     ) {
-        record ItemResponse(
+        public record ItemResponse(
             String medicineName,
             String dosage,
             String frequency,

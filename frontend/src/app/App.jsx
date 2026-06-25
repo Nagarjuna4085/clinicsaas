@@ -10,6 +10,7 @@ import DashboardPage from '../features/dashboard/DashboardPage'
 import PatientsPage from '../features/patients/PatientsPage'
 import PatientDetailPage from '../features/patients/PatientDetailPage'
 import AppointmentsPage from '../features/appointments/AppointmentsPage'
+import ConsultationPage from '../features/clinical/ConsultationPage'
 import BillingPage from '../features/billing/BillingPage'
 import StaffPage from '../features/staff/StaffPage'
 
@@ -30,6 +31,14 @@ export default function App() {
       >
         <Route index element={<DashboardPage />} />
         <Route path="/appointments" element={<AppointmentsPage />} />
+        <Route
+          path="/appointments/:id/consult"
+          element={
+            <RoleRoute roles={[ROLES.DOCTOR, ROLES.NURSE, ROLES.ADMIN]}>
+              <ConsultationPage />
+            </RoleRoute>
+          }
+        />
         <Route path="/patients" element={<PatientsPage />} />
         <Route path="/patients/:id" element={<PatientDetailPage />} />
         <Route

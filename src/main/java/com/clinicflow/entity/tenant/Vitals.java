@@ -42,6 +42,7 @@ public class Vitals {
     @Column(name = "height_cm")
     private Short heightCm;
 
+    @Builder.Default
     @Column(name = "recorded_at")
     private OffsetDateTime recordedAt = OffsetDateTime.now();
 }
