@@ -11,6 +11,7 @@ com/clinicflow/service/PdfService$RxLine.class
 com/clinicflow/context/TenantContext.class
 com/clinicflow/config/TenantConnectionProvider.class
 com/clinicflow/dto/AuthDto$AuthResponse.class
+com/clinicflow/dto/StaffDto$UpdateRequest.class
 com/clinicflow/repository/tenant/StaffRepository.class
 com/clinicflow/entity/tenant/Bill$BillBuilder.class
 com/clinicflow/entity/tenant/BillItem.class
@@ -23,11 +24,13 @@ com/clinicflow/dto/AuthDto$SendOtpRequest.class
 com/clinicflow/dto/AppointmentDto$CreateRequest.class
 com/clinicflow/repository/tenant/AppointmentRepository.class
 com/clinicflow/dto/BillDto.class
+com/clinicflow/dto/ClinicDto$UpdateRequest.class
 com/clinicflow/entity/tenant/Vitals.class
 com/clinicflow/dto/AppointmentDto$StatusUpdate.class
 com/clinicflow/dto/BillDto$CreateRequest.class
 com/clinicflow/dto/AuthDto.class
 com/clinicflow/dto/PrescriptionDto.class
+com/clinicflow/dto/ClinicDto$Profile.class
 com/clinicflow/repository/tenant/PrescriptionRepository.class
 com/clinicflow/entity/tenant/Vitals$VitalsBuilder.class
 com/clinicflow/controller/PatientController.class
@@ -83,12 +86,14 @@ com/clinicflow/config/TenantSchemaResolver.class
 com/clinicflow/repository/tenant/ConsultationRepository.class
 com/clinicflow/entity/tenant/Patient.class
 com/clinicflow/dto/BillDto$Response$Item.class
+com/clinicflow/service/ClinicService.class
 com/clinicflow/dto/StaffDto$CreateRequest.class
 com/clinicflow/entity/tenant/BillItem$BillItemBuilder.class
 com/clinicflow/service/BillService.class
 com/clinicflow/dto/VitalsDto$CreateRequest.class
 com/clinicflow/service/TenantProvisioningService.class
 com/clinicflow/dto/PrescriptionDto$Response.class
+com/clinicflow/controller/ClinicProfileController.class
 com/clinicflow/controller/ClinicController.class
 com/clinicflow/dto/ClinicDto.class
 com/clinicflow/entity/global/StaffDirectory.class

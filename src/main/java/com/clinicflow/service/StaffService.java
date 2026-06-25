@@ -66,6 +66,27 @@ public class StaffService {
             .collect(Collectors.toList());
     }
 
+    @Transactional
+    public StaffDto.Response update(java.util.UUID id, StaffDto.UpdateRequest req) {
+        Staff s = staffRepo.findById(id)
+            .orElseThrow(() -> new RuntimeException("Staff not found"));
+        s.setName(req.name());
+        s.setRole(req.role().toUpperCase());
+        s.setRegNumber(req.regNumber());
+        s.setSpecialty(req.specialty());
+        return toResponse(staffRepo.save(s));
+    }
+
+    /** Soft-deactivate: marks inactive and frees the phone (removes the login directory entry). */
+    @Transactional
+    public void deactivate(java.util.UUID id) {
+        Staff s = staffRepo.findById(id)
+            .orElseThrow(() -> new RuntimeException("Staff not found"));
+        s.setActive(false);
+        staffRepo.save(s);
+        directoryRepo.deleteByPhone(s.getPhone());
+    }
+
     private StaffDto.Response toResponse(Staff s) {
         return new StaffDto.Response(
             s.getId(), s.getName(), s.getPhone(),

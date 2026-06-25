@@ -98,6 +98,10 @@ public class AuthController {
             Staff staff = staffRepo.findByPhone(req.phone())
                 .orElseThrow(() -> new RuntimeException("Staff not found"));
 
+            if (!staff.isActive()) {
+                throw new RuntimeException("This staff account has been deactivated");
+            }
+
             String token = jwtUtil.generate(
                 staff.getId().toString(),
                 staff.getRole(),

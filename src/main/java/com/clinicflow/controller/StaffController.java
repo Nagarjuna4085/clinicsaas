@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Staff management within a clinic. All routes run against the caller's clinic
@@ -39,5 +40,21 @@ public class StaffController {
     @PreAuthorize("hasAnyRole('ADMIN','RECEPTIONIST','DOCTOR','NURSE')")
     public ResponseEntity<List<StaffDto.Response>> list() {
         return ResponseEntity.ok(staffService.listActive());
+    }
+
+    @Operation(summary = "Update a staff member", description = "Update name, role, registration and specialty (phone is fixed). Role: ADMIN.")
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<StaffDto.Response> update(@PathVariable UUID id,
+                                                    @Valid @RequestBody StaffDto.UpdateRequest req) {
+        return ResponseEntity.ok(staffService.update(id, req));
+    }
+
+    @Operation(summary = "Deactivate a staff member", description = "Soft-deactivates the staff member and revokes their login. Role: ADMIN.")
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> deactivate(@PathVariable UUID id) {
+        staffService.deactivate(id);
+        return ResponseEntity.noContent().build();
     }
 }

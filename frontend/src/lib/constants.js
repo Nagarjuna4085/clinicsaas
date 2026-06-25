@@ -14,6 +14,7 @@ export const NAV_ITEMS = [
   { to: '/patients', label: 'Patients', roles: ALL_ROLES },
   { to: '/billing', label: 'Billing', roles: [ROLES.ADMIN, ROLES.RECEPTIONIST, ROLES.DOCTOR] },
   { to: '/staff', label: 'Staff', roles: ALL_ROLES },
+  { to: '/clinic', label: 'Settings', roles: [ROLES.ADMIN] },
 ]
 
 export const APPOINTMENT_STATUSES = ['WAITING', 'CONSULTING', 'COMPLETED', 'CANCELLED']

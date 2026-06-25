@@ -13,6 +13,7 @@ import AppointmentsPage from '../features/appointments/AppointmentsPage'
 import ConsultationPage from '../features/clinical/ConsultationPage'
 import BillingPage from '../features/billing/BillingPage'
 import StaffPage from '../features/staff/StaffPage'
+import ClinicSettingsPage from '../features/clinic/ClinicSettingsPage'
 
 export default function App() {
   return (
@@ -54,6 +55,14 @@ export default function App() {
           element={
             <RoleRoute roles={[ROLES.ADMIN, ROLES.RECEPTIONIST, ROLES.DOCTOR, ROLES.NURSE]}>
               <StaffPage />
+            </RoleRoute>
+          }
+        />
+        <Route
+          path="/clinic"
+          element={
+            <RoleRoute roles={[ROLES.ADMIN]}>
+              <ClinicSettingsPage />
             </RoleRoute>
           }
         />

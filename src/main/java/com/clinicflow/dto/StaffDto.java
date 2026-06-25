@@ -14,6 +14,13 @@ public class StaffDto {
         String specialty
     ) {}
 
+    public record UpdateRequest(
+        @NotBlank String name,
+        @NotBlank String role,      // DOCTOR / RECEPTIONIST / NURSE / ADMIN
+        String regNumber,
+        String specialty
+    ) {}
+
     public record Response(
         UUID id,
         String name,

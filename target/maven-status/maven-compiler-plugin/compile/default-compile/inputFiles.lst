@@ -20,6 +20,7 @@
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/dto/StaffDto.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/entity/tenant/Staff.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/scheduler/FollowUpReminderScheduler.java
+/Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/service/ClinicService.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/config/OpenApiConfig.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/entity/tenant/Patient.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/ClinicFlowApplication.java
@@ -51,6 +52,7 @@
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/entity/global/Tenant.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/controller/StaffController.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/repository/tenant/ConsultationRepository.java
+/Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/controller/ClinicProfileController.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/security/JwtUtil.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/service/WhatsAppService.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/dto/AuthDto.java

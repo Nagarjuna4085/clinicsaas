@@ -27,4 +27,19 @@ public class ClinicDto {
         String role,
         String message
     ) {}
+
+    public record Profile(
+        String clinicName,
+        String ownerPhone,
+        String city,
+        String plan,
+        String status,
+        String schemaName,
+        String trialEndsAt
+    ) {}
+
+    public record UpdateRequest(
+        @NotBlank String clinicName,
+        String city
+    ) {}
 }
