@@ -22,6 +22,7 @@ com/clinicflow/dto/PatientDto$RegisterRequest.class
 com/clinicflow/entity/global/StaffDirectory$StaffDirectoryBuilder.class
 com/clinicflow/dto/AuthDto$SendOtpRequest.class
 com/clinicflow/dto/AppointmentDto$CreateRequest.class
+com/clinicflow/dto/AuthDto$LoginRequest.class
 com/clinicflow/service/RateLimiter.class
 com/clinicflow/repository/tenant/AppointmentRepository.class
 com/clinicflow/dto/SubscriptionDto.class
@@ -31,7 +32,9 @@ com/clinicflow/config/RazorpayProperties.class
 com/clinicflow/entity/tenant/Vitals.class
 com/clinicflow/dto/SubscriptionDto$SubscribeRequest.class
 com/clinicflow/dto/AppointmentDto$StatusUpdate.class
+com/clinicflow/dto/AuthDto$LoginResponse.class
 com/clinicflow/dto/BillDto$CreateRequest.class
+com/clinicflow/dto/StaffDto$CreatedResponse.class
 com/clinicflow/dto/AuthDto.class
 com/clinicflow/dto/PrescriptionDto.class
 com/clinicflow/service/OtpStore.class
@@ -64,7 +67,9 @@ com/clinicflow/entity/tenant/Staff$StaffBuilder.class
 com/clinicflow/dto/AppointmentDto$QueueItem.class
 com/clinicflow/repository/global/StaffDirectoryRepository.class
 com/clinicflow/dto/VitalsDto$Response.class
+com/clinicflow/dto/AuthDto$SetPasswordRequest.class
 com/clinicflow/service/InMemoryOtpStore.class
+com/clinicflow/dto/AuthDto$ResetPasswordRequest.class
 com/clinicflow/entity/tenant/Prescription.class
 com/clinicflow/controller/BillController.class
 com/clinicflow/dto/BillDto$Response.class
@@ -77,7 +82,6 @@ com/clinicflow/exception/BadRequestException.class
 com/clinicflow/repository/tenant/VitalsRepository.class
 com/clinicflow/controller/PrescriptionController.class
 com/clinicflow/dto/BillDto$DashboardSummary.class
-com/clinicflow/dto/AuthDto$VerifyOtpRequest.class
 com/clinicflow/entity/tenant/Appointment$AppointmentBuilder.class
 com/clinicflow/controller/StaffController.class
 com/clinicflow/repository/tenant/PatientRepository.class

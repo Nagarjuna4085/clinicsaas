@@ -2,21 +2,26 @@ package com.clinicflow.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 public class ClinicDto {
 
     /**
-     * Self-service clinic signup. Provisions a new tenant schema and creates
-     * the owner's staff record so they can immediately log in via OTP.
+     * Self-service clinic signup. Requires a one-time OTP verification of the
+     * owner phone and an owner password; provisions a new tenant schema and the
+     * owner's staff record.
      */
     public record RegisterRequest(
         @NotBlank String clinicName,
         @NotBlank @Pattern(regexp = "\\d{10}") String ownerPhone,
+        @NotBlank @Pattern(regexp = "\\d{6}") String otp,
+        @NotBlank @Size(min = 6, message = "Password must be at least 6 characters") String password,
         @NotBlank String ownerName,
         String city,
         String plan,        // starter / clinic / pro / hospital (default starter)
-        String role,        // owner's staff role (default DOCTOR)
-        String regNumber,   // NMC registration, if the owner is a doctor
+        // The owner is always created as ADMIN. If they also consult, they pass
+        // a specialty (and optionally NMC reg) and become bookable as a provider.
+        String regNumber,
         String specialty
     ) {}
 

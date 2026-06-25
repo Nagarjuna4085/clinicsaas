@@ -17,7 +17,7 @@ import org.springframework.context.annotation.Configuration;
  *   - JSON spec  : http://localhost:8080/v3/api-docs
  *
  * Declares a JWT bearer security scheme so the "Authorize" button in Swagger UI
- * lets you paste a token (from /api/auth/verify-otp) and call secured endpoints.
+ * lets you paste a token (from /api/auth/login) and call secured endpoints.
  */
 @Configuration
 public class OpenApiConfig {
@@ -38,7 +38,8 @@ public class OpenApiConfig {
                     clinic schema automatically for every request.
 
                     Auth flow: register a clinic (POST /api/public/clinics/register) →
-                    send-otp → verify-otp → use the JWT below via Authorize.""")
+                    Sign up a clinic (with OTP), then log in with phone + password
+                    to get a JWT, and paste it via Authorize.""")
                 .contact(new Contact().name("ClinicFlow").email("support@clinicflow.in")))
             // Apply the bearer scheme globally; public endpoints still work without it.
             .addSecurityItem(new SecurityRequirement().addList(schemeName))

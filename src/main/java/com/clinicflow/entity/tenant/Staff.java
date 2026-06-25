@@ -29,6 +29,13 @@ public class Staff {
     @Column(length = 60)
     private String specialty;           // General / Gynec / Ortho
 
+    @Column(name = "password_hash", length = 100)
+    private String passwordHash;        // BCrypt; null until a password is set
+
+    @Builder.Default
+    @Column(name = "must_reset_password")
+    private boolean mustResetPassword = false;
+
     @Builder.Default
     @Column(name = "is_active")
     private boolean isActive = true;

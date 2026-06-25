@@ -6,6 +6,7 @@ import { ROLES } from '../lib/constants'
 
 import LoginPage from '../features/auth/LoginPage'
 import SignupPage from '../features/auth/SignupPage'
+import ForgotPasswordPage from '../features/auth/ForgotPasswordPage'
 import SuspendedPage from '../features/subscription/SuspendedPage'
 import DashboardPage from '../features/dashboard/DashboardPage'
 import PatientsPage from '../features/patients/PatientsPage'
@@ -22,6 +23,7 @@ export default function App() {
       {/* Public */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
+      <Route path="/forgot" element={<ForgotPasswordPage />} />
       <Route path="/suspended" element={<SuspendedPage />} />
 
       {/* Authenticated app shell */}

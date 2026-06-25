@@ -27,10 +27,10 @@ public class StaffController {
         this.staffService = staffService;
     }
 
-    @Operation(summary = "Add a staff member", description = "Creates a staff record in the caller's clinic schema and registers their phone in the global directory so they can OTP-login. Role: ADMIN only.")
+    @Operation(summary = "Add a staff member", description = "Creates a staff record with a one-time temporary password (returned in the response for the admin to share). The staff member must change it on first login. Role: ADMIN only.")
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<StaffDto.Response> create(
+    public ResponseEntity<StaffDto.CreatedResponse> create(
             @Valid @RequestBody StaffDto.CreateRequest req) {
         return ResponseEntity.ok(staffService.create(req));
     }

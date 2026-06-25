@@ -40,7 +40,8 @@ export default function BookAppointmentModal({ open, onClose }) {
     queryKey: ['staff'],
     queryFn: listStaff,
     enabled: open,
-    select: (list) => list.filter((s) => s.role === 'DOCTOR'),
+    // Providers = doctors, plus admins who are also practising (have a specialty).
+    select: (list) => list.filter((s) => s.role === 'DOCTOR' || (s.role === 'ADMIN' && s.specialty)),
   })
 
   const mutation = useMutation({
@@ -128,7 +129,7 @@ export default function BookAppointmentModal({ open, onClose }) {
         </Select>
         {doctors.data && doctors.data.length === 0 && (
           <p className="text-xs text-amber-600">
-            No staff with role DOCTOR found. Add one under Staff first.
+            No bookable providers yet. Add a doctor under Staff (or mark the owner as a practising doctor).
           </p>
         )}
 

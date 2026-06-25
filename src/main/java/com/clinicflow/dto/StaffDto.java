@@ -29,4 +29,15 @@ public class StaffDto {
         String specialty,
         boolean active
     ) {}
+
+    // Returned only on creation — includes the one-time temporary password the
+    // admin shares with the new staff member.
+    public record CreatedResponse(
+        UUID id,
+        String name,
+        String phone,
+        String role,
+        String specialty,
+        String temporaryPassword
+    ) {}
 }

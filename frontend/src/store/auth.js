@@ -13,7 +13,7 @@ export const useAuthStore = create(
       clinic: null,
       staffId: null,
 
-      // Called after a successful verify-otp response.
+      // Called after a successful login / set-password / reset response.
       setAuth: ({ token, role, name, clinicName }) => {
         const claims = decodeJwt(token)
         set({
