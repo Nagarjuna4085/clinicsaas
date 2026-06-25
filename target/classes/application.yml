@@ -62,3 +62,14 @@ app:
   msg91:
     auth-key: ${MSG91_AUTH_KEY:}
     template-id: ${MSG91_TEMPLATE_ID:}
+
+  razorpay:
+    key-id: ${RAZORPAY_KEY_ID:}
+    key-secret: ${RAZORPAY_KEY_SECRET:}
+    webhook-secret: ${RAZORPAY_WEBHOOK_SECRET:}
+    # Razorpay plan IDs created in the Razorpay dashboard, keyed by app plan.
+    plan-ids:
+      starter: ${RAZORPAY_PLAN_STARTER:}
+      clinic: ${RAZORPAY_PLAN_CLINIC:}
+      pro: ${RAZORPAY_PLAN_PRO:}
+      hospital: ${RAZORPAY_PLAN_HOSPITAL:}

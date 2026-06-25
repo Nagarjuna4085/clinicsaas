@@ -23,9 +23,12 @@ com/clinicflow/entity/global/StaffDirectory$StaffDirectoryBuilder.class
 com/clinicflow/dto/AuthDto$SendOtpRequest.class
 com/clinicflow/dto/AppointmentDto$CreateRequest.class
 com/clinicflow/repository/tenant/AppointmentRepository.class
+com/clinicflow/dto/SubscriptionDto.class
 com/clinicflow/dto/BillDto.class
 com/clinicflow/dto/ClinicDto$UpdateRequest.class
+com/clinicflow/config/RazorpayProperties.class
 com/clinicflow/entity/tenant/Vitals.class
+com/clinicflow/dto/SubscriptionDto$SubscribeRequest.class
 com/clinicflow/dto/AppointmentDto$StatusUpdate.class
 com/clinicflow/dto/BillDto$CreateRequest.class
 com/clinicflow/dto/AuthDto.class
@@ -44,6 +47,7 @@ com/clinicflow/entity/global/Tenant.class
 com/clinicflow/entity/tenant/PrescriptionItem.class
 com/clinicflow/dto/PatientDto$Response.class
 com/clinicflow/controller/AppointmentController.class
+com/clinicflow/service/RazorpayService.class
 com/clinicflow/service/StaffService.class
 com/clinicflow/dto/PatientDto.class
 com/clinicflow/entity/tenant/Prescription$PrescriptionBuilder.class
@@ -60,6 +64,8 @@ com/clinicflow/entity/tenant/Prescription.class
 com/clinicflow/controller/BillController.class
 com/clinicflow/dto/BillDto$Response.class
 com/clinicflow/service/Msg91Service.class
+com/clinicflow/scheduler/SubscriptionScheduler.class
+com/clinicflow/dto/SubscriptionDto$Status.class
 com/clinicflow/security/JwtAuthFilter.class
 com/clinicflow/service/WhatsAppService.class
 com/clinicflow/repository/tenant/VitalsRepository.class
@@ -76,10 +82,14 @@ com/clinicflow/repository/tenant/BillRepository.class
 com/clinicflow/config/OpenApiConfig.class
 com/clinicflow/entity/tenant/Consultation$ConsultationBuilder.class
 com/clinicflow/entity/tenant/Staff.class
+com/clinicflow/dto/SubscriptionDto$SubscribeResponse.class
 com/clinicflow/entity/tenant/PrescriptionItem$PrescriptionItemBuilder.class
 com/clinicflow/service/PdfService.class
 com/clinicflow/service/PdfService$BillLine.class
 com/clinicflow/dto/PrescriptionDto$CreateRequest.class
+com/clinicflow/controller/SubscriptionController.class
+com/clinicflow/service/SubscriptionService.class
+com/clinicflow/controller/RazorpayWebhookController.class
 com/clinicflow/service/DashboardService.class
 com/clinicflow/entity/tenant/Consultation.class
 com/clinicflow/config/TenantSchemaResolver.class

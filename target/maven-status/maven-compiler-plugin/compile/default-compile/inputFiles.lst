@@ -13,11 +13,13 @@
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/security/JwtAuthFilter.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/dto/BillDto.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/repository/tenant/StaffRepository.java
+/Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/config/RazorpayProperties.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/entity/tenant/PrescriptionItem.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/config/TenantSchemaResolver.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/controller/ClinicController.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/dto/ClinicDto.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/dto/StaffDto.java
+/Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/dto/SubscriptionDto.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/entity/tenant/Staff.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/scheduler/FollowUpReminderScheduler.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/service/ClinicService.java
@@ -31,6 +33,7 @@
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/repository/tenant/VitalsRepository.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/entity/global/StaffDirectory.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/repository/tenant/AppointmentRepository.java
+/Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/service/SubscriptionService.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/controller/BillController.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/controller/VitalsController.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/service/DashboardService.java
@@ -39,7 +42,10 @@
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/entity/tenant/Vitals.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/controller/AuthController.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/service/BillService.java
+/Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/scheduler/SubscriptionScheduler.java
+/Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/controller/RazorpayWebhookController.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/controller/AppointmentController.java
+/Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/service/RazorpayService.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/repository/tenant/BillRepository.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/service/AppointmentService.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/service/PrescriptionService.java
@@ -57,4 +63,5 @@
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/service/WhatsAppService.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/dto/AuthDto.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/dto/AppointmentDto.java
+/Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/controller/SubscriptionController.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/repository/tenant/PatientRepository.java

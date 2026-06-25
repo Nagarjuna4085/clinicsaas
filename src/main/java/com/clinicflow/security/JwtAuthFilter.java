@@ -1,6 +1,7 @@
 package com.clinicflow.security;
 
 import com.clinicflow.context.TenantContext;
+import com.clinicflow.repository.global.TenantRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,14 +20,18 @@ import java.util.List;
  * 1. Extracts JWT from Authorization header
  * 2. Sets TenantContext (which schema Hibernate will use)
  * 3. Sets Spring Security principal (role-based access)
+ * 4. Blocks suspended clinics (402), except billing/profile paths so an admin
+ *    can still log in and re-subscribe.
  */
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
+    private final TenantRepository tenantRepository;
 
-    public JwtAuthFilter(JwtUtil jwtUtil) {
+    public JwtAuthFilter(JwtUtil jwtUtil, TenantRepository tenantRepository) {
         this.jwtUtil = jwtUtil;
+        this.tenantRepository = tenantRepository;
     }
 
     @Override
@@ -54,6 +59,18 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     List.of(new SimpleGrantedAuthority("ROLE_" + role))
                 );
                 SecurityContextHolder.getContext().setAuthentication(auth);
+
+                // Billing gate: block a suspended clinic from using the app, but
+                // allow billing + profile endpoints so they can renew.
+                if (tenantId != null && !isBillingExempt(request.getRequestURI())
+                        && isSuspended(tenantId)) {
+                    TenantContext.clear();
+                    response.setStatus(402); // Payment Required
+                    response.setContentType("application/json");
+                    response.getWriter().write(
+                        "{\"error\":\"Subscription inactive — please renew to continue.\"}");
+                    return;
+                }
             }
         }
 
@@ -63,5 +80,23 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             // Always clear tenant — prevents thread pool leakage
             TenantContext.clear();
         }
+    }
+
+    private boolean isSuspended(String schemaName) {
+        try {
+            return tenantRepository.findBySchemaName(schemaName)
+                .map(t -> "suspended".equals(t.getStatus()))
+                .orElse(false);
+        } catch (Exception e) {
+            // Fail open on lookup errors to avoid locking everyone out.
+            return false;
+        }
+    }
+
+    private boolean isBillingExempt(String uri) {
+        return uri.startsWith("/api/subscription")
+            || uri.equals("/api/clinic")
+            || uri.startsWith("/api/auth")
+            || uri.startsWith("/api/public");
     }
 }

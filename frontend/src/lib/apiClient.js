@@ -24,6 +24,11 @@ api.interceptors.response.use(
         window.location.assign('/login')
       }
     }
+    // 402 = clinic subscription suspended → show the static suspended page
+    // (no API calls there, so no redirect loop for non-admin staff).
+    if (status === 402 && window.location.pathname !== '/suspended') {
+      window.location.assign('/suspended')
+    }
     return Promise.reject(error)
   }
 )
