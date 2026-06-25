@@ -5,7 +5,6 @@ com/clinicflow/dto/PrescriptionDto$Response$ItemResponse.class
 com/clinicflow/dto/BillDto$CreateRequest$LineItem.class
 com/clinicflow/entity/global/Tenant$TenantBuilder.class
 com/clinicflow/dto/PrescriptionDto$CreateRequest$ItemRequest.class
-com/clinicflow/controller/AuthController$OtpEntry.class
 com/clinicflow/scheduler/FollowUpReminderScheduler.class
 com/clinicflow/service/PdfService$RxLine.class
 com/clinicflow/context/TenantContext.class
@@ -16,12 +15,14 @@ com/clinicflow/repository/tenant/StaffRepository.class
 com/clinicflow/entity/tenant/Bill$BillBuilder.class
 com/clinicflow/entity/tenant/BillItem.class
 com/clinicflow/dto/AppointmentDto.class
+com/clinicflow/exception/GlobalExceptionHandler$ApiError.class
 com/clinicflow/entity/tenant/Patient$PatientBuilder.class
 com/clinicflow/repository/global/TenantRepository.class
 com/clinicflow/dto/PatientDto$RegisterRequest.class
 com/clinicflow/entity/global/StaffDirectory$StaffDirectoryBuilder.class
 com/clinicflow/dto/AuthDto$SendOtpRequest.class
 com/clinicflow/dto/AppointmentDto$CreateRequest.class
+com/clinicflow/service/RateLimiter.class
 com/clinicflow/repository/tenant/AppointmentRepository.class
 com/clinicflow/dto/SubscriptionDto.class
 com/clinicflow/dto/BillDto.class
@@ -33,6 +34,7 @@ com/clinicflow/dto/AppointmentDto$StatusUpdate.class
 com/clinicflow/dto/BillDto$CreateRequest.class
 com/clinicflow/dto/AuthDto.class
 com/clinicflow/dto/PrescriptionDto.class
+com/clinicflow/service/OtpStore.class
 com/clinicflow/dto/ClinicDto$Profile.class
 com/clinicflow/repository/tenant/PrescriptionRepository.class
 com/clinicflow/entity/tenant/Vitals$VitalsBuilder.class
@@ -51,15 +53,18 @@ com/clinicflow/service/RazorpayService.class
 com/clinicflow/service/StaffService.class
 com/clinicflow/dto/PatientDto.class
 com/clinicflow/entity/tenant/Prescription$PrescriptionBuilder.class
+com/clinicflow/service/RedisOtpStore.class
 com/clinicflow/service/AppointmentService.class
 com/clinicflow/dto/VitalsDto.class
 com/clinicflow/security/JwtUtil.class
+com/clinicflow/exception/NotFoundException.class
 com/clinicflow/dto/StaffDto.class
 com/clinicflow/config/HibernateConfig.class
 com/clinicflow/entity/tenant/Staff$StaffBuilder.class
 com/clinicflow/dto/AppointmentDto$QueueItem.class
 com/clinicflow/repository/global/StaffDirectoryRepository.class
 com/clinicflow/dto/VitalsDto$Response.class
+com/clinicflow/service/InMemoryOtpStore.class
 com/clinicflow/entity/tenant/Prescription.class
 com/clinicflow/controller/BillController.class
 com/clinicflow/dto/BillDto$Response.class
@@ -68,6 +73,7 @@ com/clinicflow/scheduler/SubscriptionScheduler.class
 com/clinicflow/dto/SubscriptionDto$Status.class
 com/clinicflow/security/JwtAuthFilter.class
 com/clinicflow/service/WhatsAppService.class
+com/clinicflow/exception/BadRequestException.class
 com/clinicflow/repository/tenant/VitalsRepository.class
 com/clinicflow/controller/PrescriptionController.class
 com/clinicflow/dto/BillDto$DashboardSummary.class
@@ -86,7 +92,9 @@ com/clinicflow/dto/SubscriptionDto$SubscribeResponse.class
 com/clinicflow/entity/tenant/PrescriptionItem$PrescriptionItemBuilder.class
 com/clinicflow/service/PdfService.class
 com/clinicflow/service/PdfService$BillLine.class
+com/clinicflow/service/InMemoryOtpStore$Entry.class
 com/clinicflow/dto/PrescriptionDto$CreateRequest.class
+com/clinicflow/exception/RateLimitExceededException.class
 com/clinicflow/controller/SubscriptionController.class
 com/clinicflow/service/SubscriptionService.class
 com/clinicflow/controller/RazorpayWebhookController.class
@@ -107,4 +115,5 @@ com/clinicflow/controller/ClinicProfileController.class
 com/clinicflow/controller/ClinicController.class
 com/clinicflow/dto/ClinicDto.class
 com/clinicflow/entity/global/StaffDirectory.class
+com/clinicflow/exception/GlobalExceptionHandler.class
 com/clinicflow/controller/AuthController.class

@@ -41,6 +41,13 @@ spring:
     locations: classpath:db/migration/global
     baseline-on-migrate: true
 
+  # Only used when app.otp.store=redis. Connection is lazy, so leaving this
+  # pointed at a non-running Redis is harmless unless the redis store is enabled.
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
 app:
   jwt:
     secret: ${JWT_SECRET:dev-only-change-me-32char-min-secret-key}
@@ -49,6 +56,8 @@ app:
   otp:
     expiry-minutes: 10
     length: 6
+    # 'memory' (default, single instance) or 'redis' (multi-instance prod)
+    store: ${OTP_STORE:memory}
 
   aws:
     region: ap-south-1
@@ -73,3 +82,7 @@ app:
       clinic: ${RAZORPAY_PLAN_CLINIC:}
       pro: ${RAZORPAY_PLAN_PRO:}
       hospital: ${RAZORPAY_PLAN_HOSPITAL:}
+
+  # Local testing helpers — MUST stay false in production.
+  dev-tools:
+    enabled: ${DEV_TOOLS:false}

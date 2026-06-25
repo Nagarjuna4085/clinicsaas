@@ -2,6 +2,8 @@ package com.clinicflow.security;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import java.security.Key;
@@ -10,6 +12,8 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
+    private static final Logger log = LoggerFactory.getLogger(JwtUtil.class);
+
     private final Key key;
     private final long expirationMs;
 
@@ -17,6 +21,11 @@ public class JwtUtil {
         @Value("${app.jwt.secret}") String secret,
         @Value("${app.jwt.expiration-ms}") long expirationMs
     ) {
+        // Fail loud (in logs) if the insecure dev default is still in use.
+        if (secret == null || secret.startsWith("dev-only")) {
+            log.warn("!!! Using the DEVELOPMENT JWT secret. Set a strong JWT_SECRET " +
+                "(>=32 random chars) before deploying to production. !!!");
+        }
         this.key = Keys.hmacShaKeyFor(secret.getBytes());
         this.expirationMs = expirationMs;
     }

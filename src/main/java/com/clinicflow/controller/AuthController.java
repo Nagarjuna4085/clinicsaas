@@ -3,26 +3,32 @@ package com.clinicflow.controller;
 import com.clinicflow.dto.AuthDto;
 import com.clinicflow.entity.global.Tenant;
 import com.clinicflow.entity.tenant.Staff;
+import com.clinicflow.exception.BadRequestException;
+import com.clinicflow.exception.NotFoundException;
 import com.clinicflow.repository.global.StaffDirectoryRepository;
 import com.clinicflow.repository.global.TenantRepository;
 import com.clinicflow.repository.tenant.StaffRepository;
 import com.clinicflow.security.JwtUtil;
 import com.clinicflow.service.Msg91Service;
+import com.clinicflow.service.OtpStore;
+import com.clinicflow.service.RateLimiter;
 import com.clinicflow.context.TenantContext;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.time.Duration;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Phone OTP authentication.
- * POST /api/auth/send-otp   → sends OTP via MSG91
+ * POST /api/auth/send-otp   → sends OTP (MSG91 when configured, else logged)
  * POST /api/auth/verify-otp → verifies OTP, returns JWT
+ *
+ * OTPs live in a pluggable {@link OtpStore} (in-memory by default, Redis in
+ * prod) and both endpoints are rate-limited per phone.
  */
 @Tag(name = "Auth", description = "Phone OTP login. Public — no JWT required.")
 @SecurityRequirements // overrides the global bearerAuth: these endpoints are public
@@ -30,76 +36,73 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    // In-memory OTP store for MVP — replace with Redis in production
-    private final Map<String, OtpEntry> otpStore = new ConcurrentHashMap<>();
+    private static final Duration RATE_WINDOW = Duration.ofMinutes(15);
+    private static final int MAX_SENDS = 5;     // OTP requests per phone / window
+    private static final int MAX_VERIFIES = 8;  // verify attempts per phone / window
 
     private final TenantRepository tenantRepo;
     private final StaffDirectoryRepository directoryRepo;
     private final StaffRepository staffRepo;
     private final JwtUtil jwtUtil;
     private final Msg91Service msg91Service;
-    private final long otpExpiryMs;
+    private final OtpStore otpStore;
+    private final RateLimiter rateLimiter;
 
     public AuthController(TenantRepository tenantRepo,
                           StaffDirectoryRepository directoryRepo,
                           StaffRepository staffRepo,
                           JwtUtil jwtUtil,
                           Msg91Service msg91Service,
-                          @Value("${app.otp.expiry-minutes:10}") long otpExpiryMinutes) {
+                          OtpStore otpStore,
+                          RateLimiter rateLimiter) {
         this.tenantRepo = tenantRepo;
         this.directoryRepo = directoryRepo;
         this.staffRepo = staffRepo;
         this.jwtUtil = jwtUtil;
         this.msg91Service = msg91Service;
-        this.otpExpiryMs = otpExpiryMinutes * 60_000L;
+        this.otpStore = otpStore;
+        this.rateLimiter = rateLimiter;
     }
 
-    @Operation(summary = "Send OTP", description = "Generates a 6-digit OTP for the phone. In this MVP the code is printed to the server console (MSG91 not wired). OTP is single-use and expires in 10 minutes.")
+    @Operation(summary = "Send OTP", description = "Generates a 6-digit OTP for the phone (sent via MSG91 when configured, otherwise logged). Single-use, expires in 10 minutes, rate-limited per phone.")
     @PostMapping("/send-otp")
     public ResponseEntity<?> sendOtp(@Valid @RequestBody AuthDto.SendOtpRequest req) {
-        // In MVP, log OTP to console. In production, call MSG91.
+        rateLimiter.check("otp-send:" + req.phone(), MAX_SENDS, RATE_WINDOW);
         String otp = generateOtp();
-        otpStore.put(req.phone(),
-            new OtpEntry(otp, System.currentTimeMillis() + otpExpiryMs));
-        // Sends via MSG91 if configured; otherwise logs the OTP for local dev.
+        otpStore.save(req.phone(), otp);
         msg91Service.sendOtp(req.phone(), otp);
         return ResponseEntity.ok(Map.of("message", "OTP sent"));
     }
 
-    @Operation(summary = "Verify OTP → JWT", description = "Validates the OTP, resolves the staff's clinic via the global directory (fallback: owner phone), and returns a JWT plus role/name/clinic. Use the token via the Authorize button.")
+    @Operation(summary = "Verify OTP → JWT", description = "Validates the OTP, resolves the staff's clinic via the global directory (fallback: owner phone), and returns a JWT plus role/name/clinic.")
     @PostMapping("/verify-otp")
     public ResponseEntity<?> verifyOtp(@Valid @RequestBody AuthDto.VerifyOtpRequest req) {
-        OtpEntry stored = otpStore.get(req.phone());
-        if (stored == null || !stored.otp().equals(req.otp())) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Invalid OTP"));
-        }
-        if (System.currentTimeMillis() > stored.expiresAt()) {
-            otpStore.remove(req.phone());
-            return ResponseEntity.badRequest().body(Map.of("error", "OTP expired"));
+        rateLimiter.check("otp-verify:" + req.phone(), MAX_VERIFIES, RATE_WINDOW);
+
+        String stored = otpStore.get(req.phone());
+        if (stored == null || !stored.equals(req.otp())) {
+            throw new BadRequestException("Invalid or expired OTP");
         }
         otpStore.remove(req.phone());
 
-        // Resolve which clinic this phone belongs to.
-        // Prefer the global staff directory (works for ANY staff member); fall
-        // back to owner-phone lookup for clinics registered before the directory
-        // existed.
+        // Resolve which clinic this phone belongs to (directory first, then owner phone).
         String schemaName = directoryRepo.findByPhone(req.phone())
             .map(d -> d.getSchemaName())
             .orElseGet(() -> tenantRepo.findByOwnerPhone(req.phone())
                 .map(Tenant::getSchemaName)
-                .orElseThrow(() -> new RuntimeException("No clinic found for this phone")));
+                .orElseThrow(() -> new NotFoundException("No clinic found for this phone")));
 
         Tenant tenant = tenantRepo.findBySchemaName(schemaName)
-            .orElseThrow(() -> new RuntimeException("Clinic not found"));
+            .orElseThrow(() -> new NotFoundException("Clinic not found"));
 
         // Switch to tenant schema to find staff record
         TenantContext.set(tenant.getSchemaName());
         try {
             Staff staff = staffRepo.findByPhone(req.phone())
-                .orElseThrow(() -> new RuntimeException("Staff not found"));
+                .orElseThrow(() -> new NotFoundException("Staff not found"));
 
             if (!staff.isActive()) {
-                throw new RuntimeException("This staff account has been deactivated");
+                throw new BadRequestException("This staff account has been deactivated");
             }
 
             String token = jwtUtil.generate(
@@ -120,9 +123,6 @@ public class AuthController {
     }
 
     private String generateOtp() {
-        return String.valueOf(100000 + (int)(Math.random() * 900000));
+        return String.valueOf(100000 + (int) (Math.random() * 900000));
     }
-
-    /** OTP value plus its absolute expiry timestamp (epoch millis). */
-    private record OtpEntry(String otp, long expiresAt) {}
 }

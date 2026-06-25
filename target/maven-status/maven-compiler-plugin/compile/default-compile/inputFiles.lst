@@ -7,6 +7,7 @@
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/dto/PatientDto.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/entity/tenant/Bill.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/repository/tenant/PrescriptionRepository.java
+/Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/service/InMemoryOtpStore.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/dto/PrescriptionDto.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/context/TenantContext.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/config/SecurityConfig.java
@@ -46,10 +47,14 @@
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/controller/RazorpayWebhookController.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/controller/AppointmentController.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/service/RazorpayService.java
+/Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/exception/RateLimitExceededException.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/repository/tenant/BillRepository.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/service/AppointmentService.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/service/PrescriptionService.java
+/Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/exception/GlobalExceptionHandler.java
+/Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/exception/BadRequestException.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/entity/tenant/Appointment.java
+/Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/service/RateLimiter.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/repository/global/TenantRepository.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/service/VitalsService.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/dto/VitalsDto.java
@@ -58,10 +63,13 @@
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/entity/global/Tenant.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/controller/StaffController.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/repository/tenant/ConsultationRepository.java
+/Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/service/OtpStore.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/controller/ClinicProfileController.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/security/JwtUtil.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/service/WhatsAppService.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/dto/AuthDto.java
+/Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/exception/NotFoundException.java
+/Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/service/RedisOtpStore.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/dto/AppointmentDto.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/controller/SubscriptionController.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/repository/tenant/PatientRepository.java

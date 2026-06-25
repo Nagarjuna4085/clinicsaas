@@ -1,5 +1,35 @@
 # ClinicFlow API — Spring Boot Multi-tenant Backend
 
+## Run with Docker (whole stack)
+
+The fastest way to run everything (Postgres + API + frontend):
+
+```bash
+docker compose up --build
+```
+
+- Frontend: http://localhost:5173
+- API + Swagger: http://localhost:8080/swagger-ui.html
+
+Postgres data persists in the `pgdata` volume. Override secrets/integration keys
+via the `environment:` block in `docker-compose.yml` (notably `JWT_SECRET`, and
+the `RAZORPAY_*` / `MSG91_*` / `GUPSHUP_*` keys). `DEV_TOOLS` is on for local
+testing — set it to `false` for anything real.
+
+To build the images individually:
+
+```bash
+docker build -t clinicflow-api .              # backend
+docker build -t clinicflow-frontend frontend  # frontend
+```
+
+## CI
+
+`.github/workflows/ci.yml` runs on every push / PR:
+- **backend** — `mvn -B verify` (compiles + runs the unit tests)
+- **frontend** — `npm ci && npm run build`
+- **docker** — builds both images (after the above pass)
+
 ## Project Structure
 
 ```
