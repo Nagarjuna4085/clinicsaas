@@ -1,0 +1,74 @@
+package com.clinicflow.controller;
+
+import com.clinicflow.context.TenantContext;
+import com.clinicflow.dto.ClinicDto;
+import com.clinicflow.entity.global.Tenant;
+import com.clinicflow.entity.tenant.Staff;
+import com.clinicflow.repository.tenant.StaffRepository;
+import com.clinicflow.service.TenantProvisioningService;
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+/**
+ * Public self-service clinic onboarding.
+ *
+ * Lives under /api/public/** (permitted without a JWT in SecurityConfig).
+ * This closes the gap where TenantProvisioningService existed but no endpoint
+ * called it — so a brand-new clinic had no way to register and OTP login would
+ * always fail with "No clinic found for this phone".
+ */
+@RestController
+@RequestMapping("/api/public/clinics")
+public class ClinicController {
+
+    private final TenantProvisioningService provisioningService;
+    private final StaffRepository staffRepo;
+
+    public ClinicController(TenantProvisioningService provisioningService,
+                            StaffRepository staffRepo) {
+        this.provisioningService = provisioningService;
+        this.staffRepo = staffRepo;
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<ClinicDto.RegisterResponse> register(
+            @Valid @RequestBody ClinicDto.RegisterRequest req) {
+
+        // 1. Provision schema + run tenant migrations + save global.tenants row
+        Tenant tenant = provisioningService.provisionNewClinic(
+            req.clinicName(),
+            req.ownerPhone(),
+            req.city(),
+            req.plan() != null ? req.plan() : "starter"
+        );
+
+        // 2. Create the owner's staff record inside the new schema so the
+        //    subsequent OTP login (which looks up staff by phone) succeeds.
+        //    TenantContext is set BEFORE the save so the save opens a new
+        //    transaction bound to the new schema's search_path.
+        String role = req.role() != null ? req.role().toUpperCase() : "DOCTOR";
+        TenantContext.set(tenant.getSchemaName());
+        try {
+            Staff owner = Staff.builder()
+                .name(req.ownerName())
+                .phone(req.ownerPhone())
+                .role(role)
+                .regNumber(req.regNumber())
+                .specialty(req.specialty())
+                .isActive(true)
+                .build();
+            staffRepo.save(owner);
+        } finally {
+            TenantContext.clear();
+        }
+
+        return ResponseEntity.ok(new ClinicDto.RegisterResponse(
+            tenant.getClinicName(),
+            tenant.getSchemaName(),
+            req.ownerName(),
+            role,
+            "Clinic registered. Log in via POST /api/auth/send-otp with the owner phone."
+        ));
+    }
+}

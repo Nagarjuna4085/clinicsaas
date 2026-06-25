@@ -1,0 +1,63 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/clinicflow}
+    username: ${DB_USERNAME:nagarjunasanam}
+    password: ${DB_PASSWORD:}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 30000
+
+  jpa:
+    # Disable Open Session In View. With OSIV on, Hibernate opens the session at
+    # request start and pins the tenant then — which is null/global for public
+    # endpoints (no JWT yet), so writes leak to the wrong schema. With it off,
+    # the session opens inside the @Transactional method, after TenantContext is
+    # set, so it routes to the correct clinic schema. (OSIV is also an anti-pattern.)
+    open-in-view: false
+    hibernate:
+      # Multi-tenant schema-per-clinic is managed by Flyway, not Hibernate DDL.
+      # 'validate'/'update' run against a single schema at boot and break the
+      # search_path-based tenant routing, so schema management is left to Flyway.
+      ddl-auto: none
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        # NOTE: do NOT set hibernate.default_schema here. With SCHEMA
+        # multi-tenancy, table names must stay unqualified so the
+        # per-request `SET search_path` selects the right clinic. Setting a
+        # default schema would force every tenant query onto 'global'.
+        # Multi-tenancy is enabled via the connection provider + resolver
+        # wired in HibernateConfig.
+
+  flyway:
+    enabled: true
+    schemas: global
+    locations: classpath:db/migration/global
+    baseline-on-migrate: true
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:dev-only-change-me-32char-min-secret-key}
+    expiration-ms: ${JWT_EXPIRATION_MS:86400000}   # 24 hours
+
+  otp:
+    expiry-minutes: 10
+    length: 6
+
+  aws:
+    region: ap-south-1
+    s3-bucket: ${S3_BUCKET:clinicflow-files}
+
+  gupshup:
+    api-key: ${GUPSHUP_API_KEY:}
+    app-name: ${GUPSHUP_APP_NAME:ClinicFlow}
+
+  msg91:
+    auth-key: ${MSG91_AUTH_KEY:}
+    template-id: ${MSG91_TEMPLATE_ID:}
