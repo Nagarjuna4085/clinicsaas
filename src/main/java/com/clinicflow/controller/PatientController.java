@@ -30,6 +30,13 @@ public class PatientController {
         return ResponseEntity.ok(patientService.registerOrUpdate(req));
     }
 
+    @Operation(summary = "List all patients", description = "All patients in the clinic, ordered by name. Roles: RECEPTIONIST, ADMIN, DOCTOR, NURSE.")
+    @GetMapping
+    @PreAuthorize("hasAnyRole('RECEPTIONIST','ADMIN','DOCTOR','NURSE')")
+    public ResponseEntity<List<PatientDto.Response>> list() {
+        return ResponseEntity.ok(patientService.listAll());
+    }
+
     @Operation(summary = "Search patients", description = "Search by name or phone (receptionist search bar). Query param `q`. Roles: RECEPTIONIST, ADMIN, DOCTOR, NURSE.")
     @GetMapping("/search")
     @PreAuthorize("hasAnyRole('RECEPTIONIST','ADMIN','DOCTOR','NURSE')")

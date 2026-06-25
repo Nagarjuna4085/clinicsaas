@@ -57,6 +57,7 @@ app:
   gupshup:
     api-key: ${GUPSHUP_API_KEY:}
     app-name: ${GUPSHUP_APP_NAME:ClinicFlow}
+    source-number: ${GUPSHUP_SOURCE:}
 
   msg91:
     auth-key: ${MSG91_AUTH_KEY:}

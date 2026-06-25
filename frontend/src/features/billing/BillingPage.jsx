@@ -3,8 +3,10 @@ import { useQuery } from '@tanstack/react-query'
 import { getTodayBills } from './api'
 import { Card, CardHeader } from '../../components/ui/Card'
 import Modal from '../../components/ui/Modal'
+import Button from '../../components/ui/Button'
 import { Badge, CenteredSpinner, EmptyState, ErrorState } from '../../components/ui/Misc'
-import { apiErrorMessage } from '../../lib/apiClient'
+import { apiErrorMessage, downloadPdf } from '../../lib/apiClient'
+import { useToast } from '../../components/ui/Toast'
 
 const inr = (n) => `₹${Number(n ?? 0).toLocaleString('en-IN')}`
 const fmtTime = (s) => (s ? new Date(s).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : '—')
@@ -13,6 +15,15 @@ const modeColor = { CASH: 'green', UPI: 'blue', CARD: 'violet' }
 
 export default function BillingPage() {
   const [selected, setSelected] = useState(null)
+  const toast = useToast()
+
+  const downloadInvoice = async (bill) => {
+    try {
+      await downloadPdf(`/api/bills/${bill.id}/pdf`, `${bill.invoiceNumber || 'invoice'}.pdf`)
+    } catch (e) {
+      toast.error(apiErrorMessage(e, 'Could not download invoice'))
+    }
+  }
 
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ['bills', 'today'],
@@ -114,6 +125,11 @@ export default function BillingPage() {
               <Row label="SGST" value={inr(selected.sgst)} />
               <Row label="Total" value={inr(selected.total)} bold />
               <Row label="Payment" value={selected.paymentMode} />
+            </div>
+            <div className="flex justify-end pt-2">
+              <Button variant="secondary" onClick={() => downloadInvoice(selected)}>
+                Download PDF
+              </Button>
             </div>
           </div>
         )}

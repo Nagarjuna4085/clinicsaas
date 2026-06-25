@@ -7,6 +7,7 @@ import com.clinicflow.repository.global.StaffDirectoryRepository;
 import com.clinicflow.repository.global.TenantRepository;
 import com.clinicflow.repository.tenant.StaffRepository;
 import com.clinicflow.security.JwtUtil;
+import com.clinicflow.service.Msg91Service;
 import com.clinicflow.context.TenantContext;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
@@ -36,17 +37,20 @@ public class AuthController {
     private final StaffDirectoryRepository directoryRepo;
     private final StaffRepository staffRepo;
     private final JwtUtil jwtUtil;
+    private final Msg91Service msg91Service;
     private final long otpExpiryMs;
 
     public AuthController(TenantRepository tenantRepo,
                           StaffDirectoryRepository directoryRepo,
                           StaffRepository staffRepo,
                           JwtUtil jwtUtil,
+                          Msg91Service msg91Service,
                           @Value("${app.otp.expiry-minutes:10}") long otpExpiryMinutes) {
         this.tenantRepo = tenantRepo;
         this.directoryRepo = directoryRepo;
         this.staffRepo = staffRepo;
         this.jwtUtil = jwtUtil;
+        this.msg91Service = msg91Service;
         this.otpExpiryMs = otpExpiryMinutes * 60_000L;
     }
 
@@ -57,8 +61,8 @@ public class AuthController {
         String otp = generateOtp();
         otpStore.put(req.phone(),
             new OtpEntry(otp, System.currentTimeMillis() + otpExpiryMs));
-        System.out.println("OTP for " + req.phone() + " : " + otp); // dev only!
-        // TODO: call MSG91Service.send(req.phone(), otp)
+        // Sends via MSG91 if configured; otherwise logs the OTP for local dev.
+        msg91Service.sendOtp(req.phone(), otp);
         return ResponseEntity.ok(Map.of("message", "OTP sent"));
     }
 

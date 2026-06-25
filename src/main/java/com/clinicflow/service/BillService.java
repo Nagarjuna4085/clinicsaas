@@ -1,7 +1,10 @@
 package com.clinicflow.service;
 
+import com.clinicflow.context.TenantContext;
 import com.clinicflow.dto.BillDto;
+import com.clinicflow.entity.global.Tenant;
 import com.clinicflow.entity.tenant.Bill;
+import com.clinicflow.repository.global.TenantRepository;
 import com.clinicflow.repository.tenant.BillRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,9 +18,34 @@ import java.util.stream.Collectors;
 public class BillService {
 
     private final BillRepository billRepo;
+    private final TenantRepository tenantRepo;
+    private final PdfService pdfService;
 
-    public BillService(BillRepository billRepo) {
+    public BillService(BillRepository billRepo, TenantRepository tenantRepo, PdfService pdfService) {
         this.billRepo = billRepo;
+        this.tenantRepo = tenantRepo;
+        this.pdfService = pdfService;
+    }
+
+    @Transactional(readOnly = true)
+    public byte[] pdf(UUID id) {
+        Bill b = billRepo.findById(id)
+            .orElseThrow(() -> new RuntimeException("Bill not found: " + id));
+        List<PdfService.BillLine> lines = b.getItems().stream()
+            .map(i -> new PdfService.BillLine(i.getDescription(), i.getHsnSac(), i.getAmount()))
+            .collect(Collectors.toList());
+        return pdfService.invoicePdf(
+            clinicName(),
+            b.getInvoiceNumber(),
+            b.getPatient() != null ? b.getPatient().getName() : null,
+            b.getBilledAt() != null ? b.getBilledAt().toString() : null,
+            lines, b.getSubtotal(), b.getCgst(), b.getSgst(), b.getTotal(), b.getPaymentMode());
+    }
+
+    private String clinicName() {
+        String schema = TenantContext.get();
+        if (schema == null) return "Clinic";
+        return tenantRepo.findBySchemaName(schema).map(Tenant::getClinicName).orElse("Clinic");
     }
 
     @Transactional(readOnly = true)

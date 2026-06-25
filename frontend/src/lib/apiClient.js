@@ -28,6 +28,20 @@ api.interceptors.response.use(
   }
 )
 
+// Fetches a binary endpoint (with the JWT attached) and triggers a download.
+export async function downloadPdf(url, filename) {
+  const res = await api.get(url, { responseType: 'blob' })
+  const blob = new Blob([res.data], { type: 'application/pdf' })
+  const href = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = href
+  a.download = filename
+  document.body.appendChild(a)
+  a.click()
+  a.remove()
+  URL.revokeObjectURL(href)
+}
+
 // Normalize backend error messages (Spring returns {error: "..."} or {message: "..."}).
 export function apiErrorMessage(error, fallback = 'Something went wrong') {
   return (

@@ -13,3 +13,6 @@ export const getPrescription = (appointmentId) =>
 
 export const savePrescription = (payload) =>
   api.post('/api/prescriptions', payload).then((r) => r.data)
+
+export const sendPrescriptionWhatsapp = (appointmentId) =>
+  api.post(`/api/prescriptions/by-appointment/${appointmentId}/send-whatsapp`).then((r) => r.data)

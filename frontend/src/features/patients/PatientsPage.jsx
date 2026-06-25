@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
-import { searchPatients } from './api'
+import { listPatients } from './api'
 import RegisterPatientModal from './RegisterPatientModal'
 import { Card, CardHeader } from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
@@ -11,49 +11,51 @@ import { apiErrorMessage } from '../../lib/apiClient'
 
 export default function PatientsPage() {
   const [term, setTerm] = useState('')
-  const [query, setQuery] = useState('')
   const [open, setOpen] = useState(false)
 
-  const { data, isFetching, isError, error } = useQuery({
-    queryKey: ['patients', 'search', query],
-    queryFn: () => searchPatients(query),
-    enabled: query.length > 0,
+  const { data, isLoading, isError, error } = useQuery({
+    queryKey: ['patients', 'all'],
+    queryFn: listPatients,
   })
 
-  const submit = (e) => {
-    e.preventDefault()
-    setQuery(term.trim())
-  }
+  // Client-side filter over the full list (clinics are small; instant search).
+  const filtered = useMemo(() => {
+    const list = data || []
+    const q = term.trim().toLowerCase()
+    if (!q) return list
+    return list.filter(
+      (p) =>
+        p.name?.toLowerCase().includes(q) ||
+        p.phone?.includes(q) ||
+        p.uhid?.toLowerCase().includes(q)
+    )
+  }, [data, term])
 
   return (
     <div className="space-y-4">
       <Card>
         <CardHeader
           title="Patients"
-          subtitle="Search by name or phone, or register a new patient"
+          subtitle="All registered patients"
           action={<Button onClick={() => setOpen(true)}>+ Register patient</Button>}
         />
-        <form onSubmit={submit} className="flex gap-2">
-          <Input
-            placeholder="Search name or phone…"
-            value={term}
-            onChange={(e) => setTerm(e.target.value)}
-          />
-          <Button type="submit" variant="secondary">
-            Search
-          </Button>
-        </form>
+        <Input
+          placeholder="Filter by name, phone or UHID…"
+          value={term}
+          onChange={(e) => setTerm(e.target.value)}
+        />
       </Card>
 
       <Card>
-        {query.length === 0 ? (
-          <EmptyState title="Start by searching" hint="Type a name or phone number above." />
-        ) : isFetching ? (
+        {isLoading ? (
           <CenteredSpinner />
         ) : isError ? (
           <ErrorState message={apiErrorMessage(error)} />
-        ) : !data || data.length === 0 ? (
-          <EmptyState title="No patients found" hint={`No results for “${query}”.`} />
+        ) : filtered.length === 0 ? (
+          <EmptyState
+            title={data?.length ? 'No matches' : 'No patients yet'}
+            hint={data?.length ? `Nothing matches “${term}”.` : 'Register your first patient to get started.'}
+          />
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -69,7 +71,7 @@ export default function PatientsPage() {
                 </tr>
               </thead>
               <tbody>
-                {data.map((p) => (
+                {filtered.map((p) => (
                   <tr key={p.id} className="border-b border-slate-100 hover:bg-slate-50">
                     <td className="px-3 py-2 font-mono text-xs">{p.uhid}</td>
                     <td className="px-3 py-2 font-medium text-slate-700">{p.name}</td>

@@ -59,6 +59,13 @@ public class PatientService {
         return patientRepo.findByPhone(phone).map(this::toResponse);
     }
 
+    @Transactional(readOnly = true)
+    public List<PatientDto.Response> listAll() {
+        return patientRepo.findAllByOrderByNameAsc()
+            .stream().map(this::toResponse)
+            .collect(Collectors.toList());
+    }
+
     public List<PatientDto.Response> search(String query) {
         return patientRepo.search(query)
             .stream().map(this::toResponse)

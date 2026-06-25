@@ -4,6 +4,8 @@ import com.clinicflow.dto.BillDto;
 import com.clinicflow.service.BillService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -33,5 +35,16 @@ public class BillController {
     @PreAuthorize("hasAnyRole('ADMIN','RECEPTIONIST','DOCTOR')")
     public ResponseEntity<BillDto.Response> get(@PathVariable UUID id) {
         return ResponseEntity.ok(billService.get(id));
+    }
+
+    @Operation(summary = "Download invoice PDF", description = "Generates a tax-invoice PDF for the bill. Roles: ADMIN, RECEPTIONIST, DOCTOR.")
+    @GetMapping("/{id}/pdf")
+    @PreAuthorize("hasAnyRole('ADMIN','RECEPTIONIST','DOCTOR')")
+    public ResponseEntity<byte[]> pdf(@PathVariable UUID id) {
+        byte[] pdf = billService.pdf(id);
+        return ResponseEntity.ok()
+            .contentType(MediaType.APPLICATION_PDF)
+            .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"invoice-" + id + ".pdf\"")
+            .body(pdf);
     }
 }

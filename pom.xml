@@ -40,6 +40,9 @@
         <!-- Swagger / OpenAPI 3 interactive docs at /swagger-ui.html (springdoc 2.3.x aligns with Spring Boot 3.2.x) -->
         <dependency><groupId>org.springdoc</groupId><artifactId>springdoc-openapi-starter-webmvc-ui</artifactId><version>2.3.0</version></dependency>
 
+        <!-- PDF generation (OpenPDF: LGPL/MPL fork of iText, no AGPL constraints) -->
+        <dependency><groupId>com.github.librepdf</groupId><artifactId>openpdf</artifactId><version>1.3.30</version></dependency>
+
         <dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-test</artifactId><scope>test</scope></dependency>
     </dependencies>
     <build>

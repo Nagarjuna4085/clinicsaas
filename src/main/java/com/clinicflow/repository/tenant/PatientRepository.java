@@ -14,6 +14,9 @@ public interface PatientRepository extends JpaRepository<Patient, UUID> {
     Optional<Patient> findByPhone(String phone);
     Optional<Patient> findByUhid(String uhid);
 
+    // Full list for the patients page (clinics are small; client-side filters).
+    List<Patient> findAllByOrderByNameAsc();
+
     // Search by name or phone — used by receptionist search bar
     @Query("SELECT p FROM Patient p WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :q, '%')) OR p.phone LIKE CONCAT('%', :q, '%')")
     List<Patient> search(String q);

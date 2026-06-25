@@ -3,13 +3,13 @@ import { useForm, useFieldArray } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useParams, useLocation, Link } from 'react-router-dom'
-import { getVitals, saveVitals, getPrescription, savePrescription } from './api'
+import { getVitals, saveVitals, getPrescription, savePrescription, sendPrescriptionWhatsapp } from './api'
 import { vitalsSchema, prescriptionSchema } from './schemas'
 import { Card, CardHeader } from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import { Input, Textarea } from '../../components/ui/Field'
 import { Badge, CenteredSpinner } from '../../components/ui/Misc'
-import { apiErrorMessage } from '../../lib/apiClient'
+import { apiErrorMessage, downloadPdf } from '../../lib/apiClient'
 import { useToast } from '../../components/ui/Toast'
 import { useAuthStore } from '../../store/auth'
 import { ROLES } from '../../lib/constants'
@@ -149,11 +149,45 @@ function PrescriptionCard({ appointmentId }) {
     onError: (e) => toast.error(apiErrorMessage(e, 'Could not save prescription')),
   })
 
+  const whatsappMutation = useMutation({
+    mutationFn: () => sendPrescriptionWhatsapp(appointmentId),
+    onSuccess: () => {
+      toast.success('Prescription sent on WhatsApp')
+      qc.invalidateQueries({ queryKey: ['prescription', appointmentId] })
+    },
+    onError: (e) => toast.error(apiErrorMessage(e, 'Could not send WhatsApp')),
+  })
+
+  const onDownload = async () => {
+    try {
+      await downloadPdf(`/api/prescriptions/by-appointment/${appointmentId}/pdf`, `prescription-${appointmentId}.pdf`)
+    } catch (e) {
+      toast.error(apiErrorMessage(e, 'No prescription to download yet'))
+    }
+  }
+
   if (isLoading) return <Card><CenteredSpinner /></Card>
+
+  const hasSaved = !!data
 
   return (
     <Card>
-      <CardHeader title="Consultation & Prescription" subtitle="Diagnosis, medicines and follow-up" />
+      <CardHeader
+        title="Consultation & Prescription"
+        subtitle="Diagnosis, medicines and follow-up"
+        action={
+          hasSaved ? (
+            <div className="flex gap-2">
+              <Button variant="secondary" onClick={onDownload}>Download PDF</Button>
+              {canPrescribe && (
+                <Button variant="secondary" onClick={() => whatsappMutation.mutate()} loading={whatsappMutation.isPending}>
+                  Send WhatsApp
+                </Button>
+              )}
+            </div>
+          ) : null
+        }
+      />
       <form onSubmit={handleSubmit((v) => mutation.mutate(v))} className="space-y-4">
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <Textarea label="Chief complaint" disabled={!canPrescribe} {...register('chiefComplaint')} />

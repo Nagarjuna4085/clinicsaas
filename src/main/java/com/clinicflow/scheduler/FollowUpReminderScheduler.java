@@ -4,6 +4,7 @@ import com.clinicflow.context.TenantContext;
 import com.clinicflow.entity.tenant.Appointment;
 import com.clinicflow.repository.global.TenantRepository;
 import com.clinicflow.repository.tenant.AppointmentRepository;
+import com.clinicflow.service.WhatsAppService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import java.time.LocalDate;
@@ -21,12 +22,14 @@ public class FollowUpReminderScheduler {
 
     private final TenantRepository tenantRepo;
     private final AppointmentRepository appointmentRepo;
-    // private final WhatsAppService whatsAppService; // inject when ready
+    private final WhatsAppService whatsAppService;
 
     public FollowUpReminderScheduler(TenantRepository tenantRepo,
-                                      AppointmentRepository appointmentRepo) {
+                                      AppointmentRepository appointmentRepo,
+                                      WhatsAppService whatsAppService) {
         this.tenantRepo = tenantRepo;
         this.appointmentRepo = appointmentRepo;
+        this.whatsAppService = whatsAppService;
     }
 
     // Runs at 8:00 AM IST (2:30 AM UTC) every day
@@ -49,10 +52,12 @@ public class FollowUpReminderScheduler {
                     String name  = appt.getPatient().getName();
                     String date  = appt.getFollowupDate().toString();
 
-                    // TODO: whatsAppService.sendFollowUpReminder(phone, name, date, tenant.getClinicName());
-
-                    System.out.printf("REMINDER: %s (%s) — follow-up at %s on %s%n",
-                        name, phone, tenant.getClinicName(), date);
+                    if (phone != null && !phone.isBlank()) {
+                        String message = String.format(
+                            "Hi %s, this is a reminder for your follow-up at %s on %s.",
+                            name, tenant.getClinicName(), date);
+                        whatsAppService.sendText(phone, message);
+                    }
 
                     // Mark reminder as sent
                     appt.setReminderSent(true);

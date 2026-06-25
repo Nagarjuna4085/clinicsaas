@@ -1,5 +1,8 @@
 import api from '../../lib/apiClient'
 
+export const listPatients = () =>
+  api.get('/api/patients').then((r) => r.data)
+
 export const registerPatient = (payload) =>
   api.post('/api/patients', payload).then((r) => r.data)
 
