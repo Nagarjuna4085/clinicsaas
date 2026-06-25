@@ -26,24 +26,29 @@ public class Appointment {
     @Column(name = "token_number")
     private Short tokenNumber;
 
+    @Builder.Default
     @Column(name = "visit_date", nullable = false)
     private LocalDate visitDate = LocalDate.now();
 
+    @Builder.Default
     @Column(nullable = false, length = 20)
     private String status = "WAITING";  // WAITING/CONSULTING/COMPLETED/CANCELLED
 
+    @Builder.Default
     @Column(name = "visit_type", length = 20)
     private String visitType = "WALKIN"; // WALKIN/SCHEDULED/FOLLOWUP
 
     @Column(name = "followup_date")
     private LocalDate followupDate;
 
+    @Builder.Default
     @Column(name = "reminder_sent")
     private boolean reminderSent = false;
 
     @Column(columnDefinition = "TEXT")
     private String notes;
 
+    @Builder.Default
     @Column(name = "created_at")
     private OffsetDateTime createdAt = OffsetDateTime.now();
 }

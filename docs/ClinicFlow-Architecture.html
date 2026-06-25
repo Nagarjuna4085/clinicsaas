@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ClinicFlow — System Design &amp; Architecture</title>
+<style>
+  :root{
+    --bg:#0f172a; --panel:#ffffff; --ink:#0f172a; --muted:#64748b;
+    --line:#e2e8f0; --accent:#2563eb; --accent2:#0ea5e9; --green:#16a34a;
+    --amber:#d97706; --red:#dc2626; --violet:#7c3aed; --chip:#eff6ff;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+       color:var(--ink);background:#f1f5f9;line-height:1.6}
+  header.hero{background:linear-gradient(135deg,#0f172a,#1e3a8a);color:#fff;padding:48px 32px}
+  header.hero h1{margin:0 0 6px;font-size:34px;letter-spacing:-.5px}
+  header.hero p{margin:0;color:#cbd5e1;font-size:16px;max-width:760px}
+  .badges{margin-top:18px;display:flex;flex-wrap:wrap;gap:8px}
+  .badge{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);
+         padding:4px 12px;border-radius:999px;font-size:13px;color:#e2e8f0}
+  .wrap{max-width:1060px;margin:0 auto;padding:28px 24px 80px}
+  nav.toc{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 22px;margin:24px 0;
+          display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:6px 22px}
+  nav.toc a{color:var(--accent);text-decoration:none;font-size:14px;padding:3px 0}
+  nav.toc a:hover{text-decoration:underline}
+  section{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:26px 30px;margin:20px 0;
+          box-shadow:0 1px 2px rgba(15,23,42,.04)}
+  h2{font-size:23px;margin:0 0 14px;padding-bottom:10px;border-bottom:2px solid var(--line);letter-spacing:-.3px}
+  h3{font-size:17px;margin:22px 0 8px;color:#1e293b}
+  p,li{font-size:15px;color:#334155}
+  code{background:#f1f5f9;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:13px;
+       font-family:"SF Mono",Menlo,Consolas,monospace;color:#0f172a}
+  pre{background:#0f172a;color:#e2e8f0;border-radius:10px;padding:16px 18px;overflow:auto;font-size:13px;
+      font-family:"SF Mono",Menlo,Consolas,monospace;line-height:1.5}
+  pre .k{color:#93c5fd}.pre .s{color:#86efac}
+  table{width:100%;border-collapse:collapse;margin:12px 0;font-size:14px}
+  th,td{border:1px solid var(--line);padding:9px 11px;text-align:left;vertical-align:top}
+  th{background:#f8fafc;font-weight:600}
+  .tag{display:inline-block;padding:2px 9px;border-radius:6px;font-size:12px;font-weight:600}
+  .m-get{background:#dcfce7;color:#166534}.m-post{background:#dbeafe;color:#1e40af}
+  .m-patch{background:#fef3c7;color:#92400e}
+  .pub{background:#e2e8f0;color:#475569}.sec{background:#ede9fe;color:#6d28d9}
+  .callout{border-left:4px solid var(--accent);background:var(--chip);padding:12px 16px;border-radius:0 10px 10px 0;margin:14px 0}
+  .callout.warn{border-color:var(--amber);background:#fffbeb}
+  .callout.danger{border-color:var(--red);background:#fef2f2}
+  .callout.ok{border-color:var(--green);background:#f0fdf4}
+  .fig{margin:18px 0;text-align:center}
+  .fig svg{max-width:100%;height:auto}
+  .cap{color:var(--muted);font-size:13px;margin-top:6px}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:720px){.two{grid-template-columns:1fr}}
+  .pill{font-size:12px;color:#475569;background:#f1f5f9;border:1px solid var(--line);border-radius:999px;padding:2px 10px}
+  footer{color:var(--muted);font-size:13px;text-align:center;padding:30px}
+</style>
+</head>
+<body>
+<header class="hero">
+  <h1>ClinicFlow — System Design &amp; Architecture</h1>
+  <p>A multi-tenant clinic-management SaaS for India. One Spring Boot backend serves many clinics, each isolated in its own PostgreSQL schema (schema-per-tenant), with phone-OTP auth, token-queue OPD flow, and GST billing.</p>
+  <div class="badges">
+    <span class="badge">Java 21</span>
+    <span class="badge">Spring Boot 3.2.5</span>
+    <span class="badge">PostgreSQL 15+</span>
+    <span class="badge">Hibernate 6 · Schema multi-tenancy</span>
+    <span class="badge">Flyway</span>
+    <span class="badge">JWT (jjwt)</span>
+    <span class="badge">Swagger / OpenAPI 3</span>
+  </div>
+</header>
+
+<div class="wrap">
+
+<nav class="toc">
+  <a href="#overview">1 · Overview &amp; Goal</a>
+  <a href="#stack">2 · Tech Stack</a>
+  <a href="#arch">3 · High-Level Architecture</a>
+  <a href="#tenancy">4 · Multi-Tenancy Deep Dive</a>
+  <a href="#lifecycle">5 · Request Lifecycle</a>
+  <a href="#data">6 · Data Model (ER)</a>
+  <a href="#auth">7 · Auth &amp; OTP Flow</a>
+  <a href="#provision">8 · Clinic Provisioning Flow</a>
+  <a href="#booking">9 · Appointment Booking Flow</a>
+  <a href="#security">10 · Security &amp; Roles</a>
+  <a href="#api">11 · API Reference</a>
+  <a href="#swagger">12 · Swagger UI</a>
+  <a href="#gaps">13 · Known Gaps</a>
+</nav>
+
+<!-- 1 -->
+<section id="overview">
+  <h2>1 · Overview &amp; Goal</h2>
+  <p>ClinicFlow lets small and medium Indian clinics run their front desk and consultations digitally. A single deployment serves many clinics ("tenants"), each fully isolated in a dedicated PostgreSQL schema. The product is deliberately India-specific: phone-OTP login, a token-based OPD queue, GST/HSN invoicing, ABHA health IDs, NMC doctor registration, WhatsApp follow-up reminders, and Razorpay subscriptions.</p>
+  <div class="two">
+    <div>
+      <h3>What a clinic gets</h3>
+      <ul>
+        <li>Self-service signup with a 90-day trial</li>
+        <li>OTP login for every staff member</li>
+        <li>Patient registry with auto UHID</li>
+        <li>Daily token queue per doctor</li>
+        <li>Vitals, prescriptions, GST bills</li>
+        <li>Automated follow-up reminders</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Why schema-per-tenant</h3>
+      <ul>
+        <li><b>Hard isolation</b> — one clinic can never read another's rows</li>
+        <li><b>Simple queries</b> — entities carry no <code>tenant_id</code>; routing is at the connection layer</li>
+        <li><b>Per-tenant ops</b> — backup, restore, or migrate one clinic independently</li>
+        <li><b>Cross-tenant jobs</b> — loop over schemas for system-wide tasks (reminders)</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 2 -->
+<section id="stack">
+  <h2>2 · Tech Stack</h2>
+  <table>
+    <tr><th>Layer</th><th>Technology</th><th>Role</th></tr>
+    <tr><td>Language / Runtime</td><td>Java 21</td><td>Records, pattern matching, virtual-thread ready</td></tr>
+    <tr><td>Framework</td><td>Spring Boot 3.2.5 (Web, Data JPA, Security, Validation)</td><td>REST, DI, transactions</td></tr>
+    <tr><td>ORM</td><td>Hibernate 6.4 with <b>SCHEMA</b> multi-tenancy</td><td>Per-request schema routing</td></tr>
+    <tr><td>Database</td><td>PostgreSQL 15+</td><td>One schema per clinic + a <code>global</code> schema</td></tr>
+    <tr><td>Migrations</td><td>Flyway</td><td>Global migrations at boot; tenant migrations at signup</td></tr>
+    <tr><td>Auth</td><td>jjwt 0.12 (HS256 JWT)</td><td>Stateless tokens carrying <code>tenantId</code> + role</td></tr>
+    <tr><td>Docs</td><td>springdoc-openapi 2.3</td><td>Live Swagger UI at <code>/swagger-ui.html</code></td></tr>
+    <tr><td>Pooling</td><td>HikariCP</td><td>Connection pool (search_path reset on release)</td></tr>
+  </table>
+</section>
+
+<!-- 3 -->
+<section id="arch">
+  <h2>3 · High-Level Architecture</h2>
+  <p>Classic layered Spring Boot: controllers expose REST, services hold business logic and transactions, repositories are Spring Data JPA interfaces. The twist is the <b>multi-tenancy plumbing</b> between Hibernate and PostgreSQL that swaps the active schema per request.</p>
+  <div class="fig">
+  <svg viewBox="0 0 900 470" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system,Segoe UI,Roboto,sans-serif">
+    <defs>
+      <marker id="arr" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+        <path d="M0,0 L8,3 L0,6 Z" fill="#64748b"/>
+      </marker>
+    </defs>
+    <!-- client -->
+    <rect x="30" y="30" width="180" height="60" rx="10" fill="#1e293b"/>
+    <text x="120" y="58" fill="#fff" font-size="14" text-anchor="middle" font-weight="700">Clients</text>
+    <text x="120" y="76" fill="#cbd5e1" font-size="11" text-anchor="middle">Reception · Doctor · Mobile</text>
+
+    <!-- security filter -->
+    <rect x="280" y="20" width="590" height="80" rx="10" fill="#ede9fe" stroke="#c4b5fd"/>
+    <text x="295" y="42" fill="#6d28d9" font-size="12" font-weight="700">Security filter chain</text>
+    <rect x="300" y="52" width="150" height="34" rx="7" fill="#fff" stroke="#c4b5fd"/>
+    <text x="375" y="73" fill="#5b21b6" font-size="11" text-anchor="middle">CORS</text>
+    <rect x="465" y="52" width="180" height="34" rx="7" fill="#fff" stroke="#c4b5fd"/>
+    <text x="555" y="73" fill="#5b21b6" font-size="11" text-anchor="middle">JwtAuthFilter</text>
+    <rect x="660" y="52" width="190" height="34" rx="7" fill="#fff" stroke="#c4b5fd"/>
+    <text x="755" y="73" fill="#5b21b6" font-size="11" text-anchor="middle">Authorization (@PreAuthorize)</text>
+
+    <!-- controllers -->
+    <rect x="280" y="125" width="590" height="60" rx="10" fill="#dbeafe" stroke="#93c5fd"/>
+    <text x="295" y="147" fill="#1e40af" font-size="12" font-weight="700">Controllers (REST)</text>
+    <text x="300" y="170" fill="#1e3a8a" font-size="11">Auth · Clinic · Patient · Appointment · Staff</text>
+
+    <!-- services -->
+    <rect x="280" y="210" width="590" height="60" rx="10" fill="#cffafe" stroke="#67e8f9"/>
+    <text x="295" y="232" fill="#0e7490" font-size="12" font-weight="700">Services (@Transactional)</text>
+    <text x="300" y="255" fill="#155e75" font-size="11">PatientService · AppointmentService · StaffService · TenantProvisioningService</text>
+
+    <!-- repos -->
+    <rect x="280" y="295" width="590" height="60" rx="10" fill="#dcfce7" stroke="#86efac"/>
+    <text x="295" y="317" fill="#166534" font-size="12" font-weight="700">Repositories (Spring Data JPA)</text>
+    <text x="300" y="340" fill="#14532d" font-size="11">global/* (Tenant, StaffDirectory) · tenant/* (Patient, Appointment, Bill, Staff…)</text>
+
+    <!-- tenancy plumbing -->
+    <rect x="280" y="380" width="590" height="66" rx="10" fill="#fff7ed" stroke="#fed7aa"/>
+    <text x="295" y="402" fill="#9a3412" font-size="12" font-weight="700">Hibernate multi-tenancy</text>
+    <text x="300" y="423" fill="#7c2d12" font-size="11">TenantSchemaResolver → TenantConnectionProvider</text>
+    <text x="300" y="438" fill="#7c2d12" font-size="11">SET search_path TO &lt;clinic schema&gt;, public</text>
+
+    <!-- DB -->
+    <rect x="30" y="300" width="190" height="146" rx="10" fill="#0f172a"/>
+    <text x="125" y="324" fill="#fff" font-size="13" text-anchor="middle" font-weight="700">PostgreSQL</text>
+    <rect x="48" y="336" width="154" height="26" rx="6" fill="#1e293b"/>
+    <text x="125" y="353" fill="#93c5fd" font-size="10.5" text-anchor="middle">global (tenants, directory)</text>
+    <rect x="48" y="366" width="154" height="26" rx="6" fill="#1e293b"/>
+    <text x="125" y="383" fill="#86efac" font-size="10.5" text-anchor="middle">tenant_9876543210</text>
+    <rect x="48" y="396" width="154" height="26" rx="6" fill="#1e293b"/>
+    <text x="125" y="413" fill="#86efac" font-size="10.5" text-anchor="middle">tenant_… (per clinic)</text>
+
+    <!-- arrows -->
+    <line x1="210" y1="60" x2="278" y2="60" stroke="#64748b" stroke-width="1.6" marker-end="url(#arr)"/>
+    <line x1="575" y1="100" x2="575" y2="123" stroke="#64748b" stroke-width="1.6" marker-end="url(#arr)"/>
+    <line x1="575" y1="185" x2="575" y2="208" stroke="#64748b" stroke-width="1.6" marker-end="url(#arr)"/>
+    <line x1="575" y1="270" x2="575" y2="293" stroke="#64748b" stroke-width="1.6" marker-end="url(#arr)"/>
+    <line x1="575" y1="355" x2="575" y2="378" stroke="#64748b" stroke-width="1.6" marker-end="url(#arr)"/>
+    <line x1="278" y1="413" x2="222" y2="413" stroke="#64748b" stroke-width="1.6" marker-end="url(#arr)"/>
+  </svg>
+  <div class="cap">Request flows top-down through the filter chain, controllers, services, and repositories; Hibernate's tenancy layer rewrites the active schema before SQL hits Postgres.</div>
+  </div>
+</section>
+
+<!-- 4 -->
+<section id="tenancy">
+  <h2>4 · Multi-Tenancy Deep Dive</h2>
+  <p>Three small pieces cooperate to make every JPA query land in the right clinic's schema, with entities staying blissfully unaware of tenancy.</p>
+  <table>
+    <tr><th>Component</th><th>Responsibility</th></tr>
+    <tr><td><code>TenantContext</code></td><td>A <code>ThreadLocal&lt;String&gt;</code> holding the current request's schema name. Set by the JWT filter, cleared in a <code>finally</code> block to prevent thread-pool leakage.</td></tr>
+    <tr><td><code>TenantSchemaResolver</code></td><td>Implements Hibernate's <code>CurrentTenantIdentifierResolver</code>. Returns <code>TenantContext.get()</code> or defaults to <code>global</code>.</td></tr>
+    <tr><td><code>TenantConnectionProvider</code></td><td>Implements Hibernate's <code>MultiTenantConnectionProvider</code>. On checkout runs <code>SET search_path TO &lt;schema&gt;, public</code>; on release resets to <code>global, public</code> before returning the connection to Hikari.</td></tr>
+  </table>
+  <div class="callout">
+    <b>Key design choice:</b> entities for clinic data declare <i>no</i> schema, so Hibernate emits unqualified table names that resolve via <code>search_path</code>. Global entities (<code>Tenant</code>, <code>StaffDirectory</code>) are explicitly <code>@Table(schema="global")</code>, so they always hit the shared schema regardless of the active tenant.
+  </div>
+  <div class="callout warn">
+    <b>Two settings that must stay off:</b> <code>hibernate.default_schema</code> (would force every query onto one schema, defeating routing) and <code>ddl-auto</code> validation/update (runs against a single schema at boot). Schema management is owned entirely by Flyway. <code>open-in-view</code> is also disabled so sessions open <i>inside</i> the transactional method, after the tenant is set.
+  </div>
+</section>
+
+<!-- 5 -->
+<section id="lifecycle">
+  <h2>5 · Request Lifecycle (tenant routing)</h2>
+  <div class="fig">
+  <svg viewBox="0 0 900 250" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system,Segoe UI,Roboto,sans-serif">
+    <defs>
+      <marker id="a2" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#2563eb"/></marker>
+    </defs>
+    <g font-size="11.5">
+      <rect x="20"  y="70" width="120" height="56" rx="9" fill="#1e293b"/><text x="80"  y="94" fill="#fff" text-anchor="middle">HTTP request</text><text x="80" y="110" fill="#cbd5e1" text-anchor="middle" font-size="10">Bearer &lt;JWT&gt;</text>
+      <rect x="170" y="70" width="130" height="56" rx="9" fill="#ede9fe" stroke="#c4b5fd"/><text x="235" y="90" fill="#5b21b6" text-anchor="middle">JwtAuthFilter</text><text x="235" y="108" fill="#6d28d9" text-anchor="middle" font-size="10">parse → set TenantContext</text>
+      <rect x="330" y="70" width="130" height="56" rx="9" fill="#dbeafe" stroke="#93c5fd"/><text x="395" y="90" fill="#1e40af" text-anchor="middle">Controller</text><text x="395" y="108" fill="#1e3a8a" text-anchor="middle" font-size="10">@PreAuthorize</text>
+      <rect x="490" y="70" width="130" height="56" rx="9" fill="#cffafe" stroke="#67e8f9"/><text x="555" y="90" fill="#0e7490" text-anchor="middle">Service @Tx</text><text x="555" y="108" fill="#155e75" text-anchor="middle" font-size="10">opens session</text>
+      <rect x="650" y="70" width="110" height="56" rx="9" fill="#fff7ed" stroke="#fed7aa"/><text x="705" y="90" fill="#9a3412" text-anchor="middle">Resolver +</text><text x="705" y="106" fill="#9a3412" text-anchor="middle">Conn provider</text>
+      <rect x="788" y="70" width="92" height="56" rx="9" fill="#0f172a"/><text x="834" y="92" fill="#86efac" text-anchor="middle" font-size="10">search_path</text><text x="834" y="108" fill="#86efac" text-anchor="middle" font-size="10">= tenant</text>
+      <line x1="140" y1="98" x2="168" y2="98" stroke="#2563eb" stroke-width="1.6" marker-end="url(#a2)"/>
+      <line x1="300" y1="98" x2="328" y2="98" stroke="#2563eb" stroke-width="1.6" marker-end="url(#a2)"/>
+      <line x1="460" y1="98" x2="488" y2="98" stroke="#2563eb" stroke-width="1.6" marker-end="url(#a2)"/>
+      <line x1="620" y1="98" x2="648" y2="98" stroke="#2563eb" stroke-width="1.6" marker-end="url(#a2)"/>
+      <line x1="760" y1="98" x2="786" y2="98" stroke="#2563eb" stroke-width="1.6" marker-end="url(#a2)"/>
+      <rect x="170" y="170" width="590" height="40" rx="9" fill="#f0fdf4" stroke="#86efac"/>
+      <text x="465" y="195" fill="#166534" text-anchor="middle">finally → TenantContext.clear() · connection reset to global · returned to pool</text>
+    </g>
+  </svg>
+  <div class="cap">JWT → ThreadLocal → Hibernate resolver → <code>SET search_path</code> → SQL runs in the clinic schema → context cleared on the way out.</div>
+  </div>
+</section>
+
+<!-- 6 -->
+<section id="data">
+  <h2>6 · Data Model (ER)</h2>
+  <h3>Global schema</h3>
+  <table>
+    <tr><th>Table</th><th>Purpose</th><th>Key columns</th></tr>
+    <tr><td><code>tenants</code></td><td>One row per clinic</td><td>schema_name (uq), clinic_name, owner_phone, plan, status, trial_ends_at</td></tr>
+    <tr><td><code>staff_directory</code></td><td>Phone → clinic lookup so any staff can OTP-login</td><td>phone (PK), schema_name</td></tr>
+  </table>
+  <h3>Per-tenant schema (one copy per clinic)</h3>
+  <div class="fig">
+  <svg viewBox="0 0 900 430" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="11">
+    <defs><marker id="fk" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#94a3b8"/></marker></defs>
+    <!-- staff -->
+    <rect x="40" y="40" width="150" height="70" rx="8" fill="#eff6ff" stroke="#bfdbfe"/>
+    <text x="115" y="60" text-anchor="middle" font-weight="700" fill="#1e40af">staff</text>
+    <text x="52" y="80" fill="#334155">id · name · phone</text>
+    <text x="52" y="96" fill="#334155">role · reg_number</text>
+    <!-- patients -->
+    <rect x="40" y="180" width="150" height="86" rx="8" fill="#eff6ff" stroke="#bfdbfe"/>
+    <text x="115" y="200" text-anchor="middle" font-weight="700" fill="#1e40af">patients</text>
+    <text x="52" y="220" fill="#334155">id · uhid (uq)</text>
+    <text x="52" y="236" fill="#334155">name · phone · age</text>
+    <text x="52" y="252" fill="#334155">abha_id · allergies</text>
+    <!-- appointments -->
+    <rect x="375" y="150" width="170" height="116" rx="8" fill="#ecfeff" stroke="#a5f3fc"/>
+    <text x="460" y="170" text-anchor="middle" font-weight="700" fill="#0e7490">appointments</text>
+    <text x="388" y="190" fill="#334155">id · token_number</text>
+    <text x="388" y="206" fill="#334155">patient_id · doctor_id</text>
+    <text x="388" y="222" fill="#334155">visit_date · status</text>
+    <text x="388" y="238" fill="#334155">visit_type · followup_date</text>
+    <text x="388" y="254" fill="#334155">reminder_sent</text>
+    <!-- vitals -->
+    <rect x="375" y="40" width="170" height="70" rx="8" fill="#f0fdf4" stroke="#bbf7d0"/>
+    <text x="460" y="60" text-anchor="middle" font-weight="700" fill="#166534">vitals</text>
+    <text x="388" y="80" fill="#334155">appointment_id · bp</text>
+    <text x="388" y="96" fill="#334155">pulse · spo2 · weight</text>
+    <!-- prescriptions -->
+    <rect x="375" y="300" width="170" height="64" rx="8" fill="#f0fdf4" stroke="#bbf7d0"/>
+    <text x="460" y="320" text-anchor="middle" font-weight="700" fill="#166534">prescriptions</text>
+    <text x="388" y="340" fill="#334155">appointment_id (1:1)</text>
+    <text x="388" y="356" fill="#334155">pdf_url · whatsapp_sent</text>
+    <!-- rx items -->
+    <rect x="600" y="300" width="160" height="64" rx="8" fill="#fff" stroke="#bbf7d0"/>
+    <text x="680" y="320" text-anchor="middle" font-weight="700" fill="#166534">prescription_items</text>
+    <text x="612" y="340" fill="#334155">medicine · dosage</text>
+    <text x="612" y="356" fill="#334155">frequency · duration</text>
+    <!-- bills -->
+    <rect x="710" y="150" width="160" height="100" rx="8" fill="#fffbeb" stroke="#fde68a"/>
+    <text x="790" y="170" text-anchor="middle" font-weight="700" fill="#92400e">bills</text>
+    <text x="722" y="190" fill="#334155">invoice_number (uq)</text>
+    <text x="722" y="206" fill="#334155">appointment_id</text>
+    <text x="722" y="222" fill="#334155">subtotal · cgst · sgst</text>
+    <text x="722" y="238" fill="#334155">total · payment_mode</text>
+    <!-- bill items -->
+    <rect x="710" y="40" width="160" height="70" rx="8" fill="#fff" stroke="#fde68a"/>
+    <text x="790" y="60" text-anchor="middle" font-weight="700" fill="#92400e">bill_items</text>
+    <text x="722" y="80" fill="#334155">bill_id · description</text>
+    <text x="722" y="96" fill="#334155">hsn_sac · amount · gst</text>
+
+    <!-- FKs -->
+    <line x1="190" y1="210" x2="373" y2="210" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#fk)"/>
+    <line x1="190" y1="80"  x2="373" y2="95"  stroke="#94a3b8" stroke-width="1.4" marker-end="url(#fk)" stroke-dasharray="4 3"/>
+    <line x1="460" y1="150" x2="460" y2="112" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#fk)"/>
+    <line x1="460" y1="266" x2="460" y2="298" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#fk)"/>
+    <line x1="545" y1="332" x2="598" y2="332" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#fk)"/>
+    <line x1="545" y1="200" x2="708" y2="200" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#fk)"/>
+    <line x1="790" y1="150" x2="790" y2="112" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#fk)"/>
+  </svg>
+  <div class="cap">Solid lines = foreign keys. <code>medicine_templates</code> and <code>consultations</code> tables also exist in the schema (seeded medicines; consultation notes) and are not yet mapped to JPA entities.</div>
+  </div>
+  <div class="callout ok"><b>Concurrency-safe IDs:</b> UHIDs (<code>CF-00001</code>) and invoice numbers (<code>INV-2026-00001</code>) come from per-schema Postgres <b>sequences</b> (<code>patient_uhid_seq</code>, <code>bill_invoice_seq</code>), not <code>COUNT(*)</code>, so simultaneous registrations can't collide. A unique index on <code>(visit_date, doctor_id, token_number)</code> guards daily tokens.</div>
+</section>
+
+<!-- 7 -->
+<section id="auth">
+  <h2>7 · Auth &amp; OTP Flow</h2>
+  <p>Authentication is phone-OTP. The returned JWT carries the staff id (subject), role, and <code>tenantId</code> (the clinic schema). That token is the only thing the rest of the API needs to route to the right clinic.</p>
+  <div class="fig">
+  <svg viewBox="0 0 880 300" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="11.5">
+    <defs><marker id="a3" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#2563eb"/></marker></defs>
+    <line x1="90"  y1="40" x2="90"  y2="280" stroke="#cbd5e1"/><text x="90"  y="28" text-anchor="middle" font-weight="700" fill="#1e293b">Staff</text>
+    <line x1="340" y1="40" x2="340" y2="280" stroke="#cbd5e1"/><text x="340" y="28" text-anchor="middle" font-weight="700" fill="#1e293b">AuthController</text>
+    <line x1="590" y1="40" x2="590" y2="280" stroke="#cbd5e1"/><text x="590" y="28" text-anchor="middle" font-weight="700" fill="#1e293b">global directory</text>
+    <line x1="800" y1="40" x2="800" y2="280" stroke="#cbd5e1"/><text x="800" y="28" text-anchor="middle" font-weight="700" fill="#1e293b">tenant schema</text>
+
+    <g stroke="#2563eb" stroke-width="1.5" fill="#1e40af">
+      <line x1="90" y1="60" x2="338" y2="60" marker-end="url(#a3)"/><text x="100" y="54">POST /send-otp {phone}</text>
+      <line x1="340" y1="90" x2="92" y2="90" marker-end="url(#a3)" stroke-dasharray="4 3"/><text x="110" y="84">OTP printed to console (MVP)</text>
+      <line x1="90" y1="120" x2="338" y2="120" marker-end="url(#a3)"/><text x="100" y="114">POST /verify-otp {phone, otp}</text>
+      <line x1="340" y1="150" x2="588" y2="150" marker-end="url(#a3)"/><text x="350" y="144">lookup phone → schema_name</text>
+      <line x1="340" y1="185" x2="798" y2="185" marker-end="url(#a3)"/><text x="350" y="179">find staff by phone (in schema)</text>
+      <line x1="340" y1="235" x2="92" y2="235" marker-end="url(#a3)" stroke-dasharray="4 3"/><text x="110" y="229">200 {token, role, name, clinicName}</text>
+    </g>
+    <rect x="150" y="245" width="560" height="34" rx="8" fill="#eff6ff" stroke="#bfdbfe"/>
+    <text x="430" y="267" text-anchor="middle" fill="#1e40af">JWT claims:  sub=staffId · role · tenantId=tenant_&lt;phone&gt; · exp(24h)</text>
+  </svg>
+  <div class="cap">OTPs are single-use and expire in 10 minutes. The clinic is resolved via the global <code>staff_directory</code> (fallback: <code>tenants.owner_phone</code>), so any staff member — not just the owner — can log in.</div>
+  </div>
+</section>
+
+<!-- 8 -->
+<section id="provision">
+  <h2>8 · Clinic Provisioning Flow</h2>
+  <p>Signup is self-service and creates a brand-new isolated schema on the fly.</p>
+  <ol>
+    <li><b>POST</b> <code>/api/public/clinics/register</code> with clinic + owner details.</li>
+    <li><code>TenantProvisioningService</code> generates a schema name (<code>tenant_&lt;phone&gt;</code>) and checks it's free.</li>
+    <li><code>CREATE SCHEMA</code> for the clinic.</li>
+    <li>Flyway runs the <b>tenant</b> migrations (<code>V1</code> tables, <code>V2</code> sequences/constraints) against that schema.</li>
+    <li>The clinic row is saved in <code>global.tenants</code>.</li>
+    <li>The owner <code>Staff</code> row is created in the new schema, and the owner phone is added to <code>global.staff_directory</code>.</li>
+    <li>Owner logs in via OTP → gets a JWT scoped to the new schema.</li>
+  </ol>
+  <div class="callout warn"><b>Atomicity caveat:</b> schema DDL can't roll back inside the JPA transaction, so a failure after step 3 can leave a half-provisioned clinic (schema + tenant row, no staff). Hardening this into an all-or-nothing flow with cleanup-on-failure is a recommended follow-up.</div>
+</section>
+
+<!-- 9 -->
+<section id="booking">
+  <h2>9 · Appointment Booking Flow</h2>
+  <ol>
+    <li>Receptionist registers/looks up the patient (<code>POST /api/patients</code>) → UHID assigned from the sequence.</li>
+    <li><b>POST</b> <code>/api/appointments</code> with patientId + doctorId + opFee.</li>
+    <li>Service assigns the next token for that doctor/day and saves the appointment (status <code>WAITING</code>).</li>
+    <li>If <code>opFee &gt; 0</code>, an OP-fee <code>Bill</code> (+ <code>BillItem</code>) is created in the same transaction, invoice number from the sequence.</li>
+    <li>Doctor/reception read the queue (<code>GET /api/appointments/today</code>) and advance status to <code>CONSULTING</code> / <code>COMPLETED</code>.</li>
+  </ol>
+  <div class="callout"><b>Authorization split:</b> creating appointments is restricted to <span class="tag sec">RECEPTIONIST</span> / <span class="tag sec">ADMIN</span> (front-desk intake), while doctors and nurses can read queues and update status. An <span class="tag sec">ADMIN</span> passes every check.</div>
+</section>
+
+<!-- 10 -->
+<section id="security">
+  <h2>10 · Security &amp; Roles</h2>
+  <p>Stateless JWT. <code>JwtAuthFilter</code> validates the token, sets the tenant, and builds the Spring Security principal with authority <code>ROLE_&lt;role&gt;</code>. Method-level <code>@PreAuthorize</code> enforces per-endpoint roles.</p>
+  <table>
+    <tr><th>Role</th><th>Can do</th></tr>
+    <tr><td><span class="tag sec">ADMIN</span></td><td>Everything — staff management, intake, queues, status</td></tr>
+    <tr><td><span class="tag sec">RECEPTIONIST</span></td><td>Register patients, book appointments, view/update queue</td></tr>
+    <tr><td><span class="tag sec">DOCTOR</span></td><td>View patients &amp; queues, update appointment status</td></tr>
+    <tr><td><span class="tag sec">NURSE</span></td><td>View patients &amp; queues (read-oriented)</td></tr>
+  </table>
+  <div class="callout danger"><b>Before production:</b> move the JWT secret and DB password fully to environment/secret storage (defaults exist for dev), put OTPs in Redis, and add rate-limiting on <code>/api/auth</code>. The HS256 secret must be ≥32 bytes.</div>
+</section>
+
+<!-- 11 -->
+<section id="api">
+  <h2>11 · API Reference</h2>
+  <table>
+    <tr><th>Method</th><th>Path</th><th>Auth</th><th>Roles</th><th>Description</th></tr>
+    <tr><td><span class="tag m-post">POST</span></td><td><code>/api/public/clinics/register</code></td><td><span class="tag pub">Public</span></td><td>—</td><td>Provision a new clinic + owner</td></tr>
+    <tr><td><span class="tag m-post">POST</span></td><td><code>/api/auth/send-otp</code></td><td><span class="tag pub">Public</span></td><td>—</td><td>Send OTP (console in MVP)</td></tr>
+    <tr><td><span class="tag m-post">POST</span></td><td><code>/api/auth/verify-otp</code></td><td><span class="tag pub">Public</span></td><td>—</td><td>Verify OTP → JWT</td></tr>
+    <tr><td><span class="tag m-post">POST</span></td><td><code>/api/staff</code></td><td><span class="tag sec">JWT</span></td><td>ADMIN</td><td>Add a staff member</td></tr>
+    <tr><td><span class="tag m-get">GET</span></td><td><code>/api/staff</code></td><td><span class="tag sec">JWT</span></td><td>ADMIN, RECEPTIONIST, DOCTOR, NURSE</td><td>List active staff</td></tr>
+    <tr><td><span class="tag m-post">POST</span></td><td><code>/api/patients</code></td><td><span class="tag sec">JWT</span></td><td>RECEPTIONIST, ADMIN, DOCTOR</td><td>Register/update patient</td></tr>
+    <tr><td><span class="tag m-get">GET</span></td><td><code>/api/patients/search?q=</code></td><td><span class="tag sec">JWT</span></td><td>+ NURSE</td><td>Search by name/phone</td></tr>
+    <tr><td><span class="tag m-get">GET</span></td><td><code>/api/patients/by-phone/{phone}</code></td><td><span class="tag sec">JWT</span></td><td>RECEPTIONIST, ADMIN, DOCTOR</td><td>Lookup by phone</td></tr>
+    <tr><td><span class="tag m-get">GET</span></td><td><code>/api/patients/{id}</code></td><td><span class="tag sec">JWT</span></td><td>+ NURSE</td><td>Patient details</td></tr>
+    <tr><td><span class="tag m-post">POST</span></td><td><code>/api/appointments</code></td><td><span class="tag sec">JWT</span></td><td>RECEPTIONIST, ADMIN</td><td>Book + issue token</td></tr>
+    <tr><td><span class="tag m-get">GET</span></td><td><code>/api/appointments/today</code></td><td><span class="tag sec">JWT</span></td><td>RECEPTIONIST, ADMIN, DOCTOR, NURSE</td><td>Today's full queue</td></tr>
+    <tr><td><span class="tag m-get">GET</span></td><td><code>/api/appointments/today/doctor/{id}</code></td><td><span class="tag sec">JWT</span></td><td>DOCTOR, RECEPTIONIST, ADMIN</td><td>Doctor's queue</td></tr>
+    <tr><td><span class="tag m-patch">PATCH</span></td><td><code>/api/appointments/{id}/status</code></td><td><span class="tag sec">JWT</span></td><td>DOCTOR, RECEPTIONIST, ADMIN</td><td>Update status</td></tr>
+  </table>
+</section>
+
+<!-- 12 -->
+<section id="swagger">
+  <h2>12 · Swagger UI</h2>
+  <p>Interactive docs are generated from the controllers and served by the running app:</p>
+  <table>
+    <tr><th>Resource</th><th>URL</th></tr>
+    <tr><td>Swagger UI</td><td><code>http://localhost:8080/swagger-ui.html</code></td></tr>
+    <tr><td>OpenAPI JSON</td><td><code>http://localhost:8080/v3/api-docs</code></td></tr>
+  </table>
+  <h3>Using it</h3>
+  <ol>
+    <li>Open Swagger UI. The <b>Auth</b> and <b>Clinic Onboarding</b> groups are public — call <code>verify-otp</code> there and copy the <code>token</code>.</li>
+    <li>Click <b>Authorize</b> (top-right), paste the token, confirm. Every secured call now sends <code>Authorization: Bearer &lt;token&gt;</code>.</li>
+    <li>The token's <code>tenantId</code> automatically scopes all calls to your clinic — no extra parameters needed.</li>
+  </ol>
+  <div class="callout ok">Because the spec is generated from the actual controllers and <code>@Operation</code> annotations, the docs never drift from the code.</div>
+</section>
+
+<!-- 13 -->
+<section id="gaps">
+  <h2>13 · Known Gaps / Roadmap</h2>
+  <table>
+    <tr><th>Area</th><th>Status</th></tr>
+    <tr><td>Prescription &amp; Billing/Dashboard controllers</td><td>DTOs exist; endpoints not built</td></tr>
+    <tr><td><code>consultations</code>, <code>medicine_templates</code> entities</td><td>Tables exist; not mapped to JPA</td></tr>
+    <tr><td>MSG91 OTP / Gupshup WhatsApp</td><td>Stubbed (console / TODO)</td></tr>
+    <tr><td>iText PDF (Rx &amp; bills) + AWS S3 upload</td><td>Not built</td></tr>
+    <tr><td>Razorpay subscription webhooks</td><td>Not built</td></tr>
+    <tr><td>Follow-up reminders firing</td><td>Scheduler exists but nothing sets <code>followup_date</code> yet</td></tr>
+    <tr><td>Provisioning atomicity / OTP in Redis / auth rate-limiting</td><td>Recommended hardening</td></tr>
+  </table>
+</section>
+
+<footer>ClinicFlow · System Design &amp; Architecture · generated for the v1.0.0 backend</footer>
+</div>
+</body>
+</html>

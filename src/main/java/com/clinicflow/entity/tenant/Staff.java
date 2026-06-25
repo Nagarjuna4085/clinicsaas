@@ -29,9 +29,11 @@ public class Staff {
     @Column(length = 60)
     private String specialty;           // General / Gynec / Ortho
 
+    @Builder.Default
     @Column(name = "is_active")
     private boolean isActive = true;
 
+    @Builder.Default
     @Column(name = "created_at")
     private OffsetDateTime createdAt = OffsetDateTime.now();
 }

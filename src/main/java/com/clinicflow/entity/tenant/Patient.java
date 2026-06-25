@@ -43,6 +43,7 @@ public class Patient {
     @Column(columnDefinition = "TEXT")
     private String allergies;           // Shown as warning during Rx
 
+    @Builder.Default
     @Column(name = "created_at")
     private OffsetDateTime createdAt = OffsetDateTime.now();
 }

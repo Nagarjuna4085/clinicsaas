@@ -53,6 +53,7 @@ public class Bill {
     @Column(name = "pdf_url", columnDefinition = "TEXT")
     private String pdfUrl;
 
+    @Builder.Default
     @Column(name = "billed_at")
     private OffsetDateTime billedAt = OffsetDateTime.now();
 }
