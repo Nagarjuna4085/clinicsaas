@@ -1,8 +1,10 @@
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/repository/tenant/AppointmentRepository.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/entity/tenant/Prescription.java
+/Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/repository/global/StaffDirectoryRepository.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/service/TenantProvisioningService.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/entity/tenant/BillItem.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/entity/tenant/Vitals.java
+/Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/service/StaffService.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/dto/PatientDto.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/entity/tenant/Bill.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/controller/AuthController.java
@@ -18,6 +20,7 @@
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/config/TenantSchemaResolver.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/controller/ClinicController.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/dto/ClinicDto.java
+/Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/dto/StaffDto.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/repository/tenant/BillRepository.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/service/AppointmentService.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/entity/tenant/Appointment.java
@@ -26,6 +29,7 @@
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/repository/global/TenantRepository.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/service/PatientService.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/entity/global/Tenant.java
+/Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/controller/StaffController.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/entity/tenant/Patient.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/ClinicFlowApplication.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/config/TenantConnectionProvider.java
@@ -34,4 +38,5 @@
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/controller/PatientController.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/dto/AppointmentDto.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/config/HibernateConfig.java
+/Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/entity/global/StaffDirectory.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/repository/tenant/PatientRepository.java

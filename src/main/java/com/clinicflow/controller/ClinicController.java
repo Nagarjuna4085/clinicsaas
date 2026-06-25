@@ -2,8 +2,10 @@ package com.clinicflow.controller;
 
 import com.clinicflow.context.TenantContext;
 import com.clinicflow.dto.ClinicDto;
+import com.clinicflow.entity.global.StaffDirectory;
 import com.clinicflow.entity.global.Tenant;
 import com.clinicflow.entity.tenant.Staff;
+import com.clinicflow.repository.global.StaffDirectoryRepository;
 import com.clinicflow.repository.tenant.StaffRepository;
 import com.clinicflow.service.TenantProvisioningService;
 import jakarta.validation.Valid;
@@ -24,11 +26,14 @@ public class ClinicController {
 
     private final TenantProvisioningService provisioningService;
     private final StaffRepository staffRepo;
+    private final StaffDirectoryRepository directoryRepo;
 
     public ClinicController(TenantProvisioningService provisioningService,
-                            StaffRepository staffRepo) {
+                            StaffRepository staffRepo,
+                            StaffDirectoryRepository directoryRepo) {
         this.provisioningService = provisioningService;
         this.staffRepo = staffRepo;
+        this.directoryRepo = directoryRepo;
     }
 
     @PostMapping("/register")
@@ -59,6 +64,13 @@ public class ClinicController {
                 .isActive(true)
                 .build();
             staffRepo.save(owner);
+
+            // Register the owner's phone in the global directory so OTP login
+            // resolves their clinic (same path every staff member uses).
+            directoryRepo.save(StaffDirectory.builder()
+                .phone(req.ownerPhone())
+                .schemaName(tenant.getSchemaName())
+                .build());
         } finally {
             TenantContext.clear();
         }

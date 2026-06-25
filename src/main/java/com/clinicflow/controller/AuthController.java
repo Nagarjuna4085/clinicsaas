@@ -3,6 +3,7 @@ package com.clinicflow.controller;
 import com.clinicflow.dto.AuthDto;
 import com.clinicflow.entity.global.Tenant;
 import com.clinicflow.entity.tenant.Staff;
+import com.clinicflow.repository.global.StaffDirectoryRepository;
 import com.clinicflow.repository.global.TenantRepository;
 import com.clinicflow.repository.tenant.StaffRepository;
 import com.clinicflow.security.JwtUtil;
@@ -27,15 +28,18 @@ public class AuthController {
     private final Map<String, OtpEntry> otpStore = new ConcurrentHashMap<>();
 
     private final TenantRepository tenantRepo;
+    private final StaffDirectoryRepository directoryRepo;
     private final StaffRepository staffRepo;
     private final JwtUtil jwtUtil;
     private final long otpExpiryMs;
 
     public AuthController(TenantRepository tenantRepo,
+                          StaffDirectoryRepository directoryRepo,
                           StaffRepository staffRepo,
                           JwtUtil jwtUtil,
                           @Value("${app.otp.expiry-minutes:10}") long otpExpiryMinutes) {
         this.tenantRepo = tenantRepo;
+        this.directoryRepo = directoryRepo;
         this.staffRepo = staffRepo;
         this.jwtUtil = jwtUtil;
         this.otpExpiryMs = otpExpiryMinutes * 60_000L;
@@ -64,9 +68,18 @@ public class AuthController {
         }
         otpStore.remove(req.phone());
 
-        // Find which clinic this phone belongs to
-        Tenant tenant = tenantRepo.findByOwnerPhone(req.phone())
-            .orElseThrow(() -> new RuntimeException("No clinic found for this phone"));
+        // Resolve which clinic this phone belongs to.
+        // Prefer the global staff directory (works for ANY staff member); fall
+        // back to owner-phone lookup for clinics registered before the directory
+        // existed.
+        String schemaName = directoryRepo.findByPhone(req.phone())
+            .map(d -> d.getSchemaName())
+            .orElseGet(() -> tenantRepo.findByOwnerPhone(req.phone())
+                .map(Tenant::getSchemaName)
+                .orElseThrow(() -> new RuntimeException("No clinic found for this phone")));
+
+        Tenant tenant = tenantRepo.findBySchemaName(schemaName)
+            .orElseThrow(() -> new RuntimeException("Clinic not found"));
 
         // Switch to tenant schema to find staff record
         TenantContext.set(tenant.getSchemaName());
