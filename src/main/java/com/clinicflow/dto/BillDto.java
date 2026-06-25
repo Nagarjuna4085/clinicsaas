@@ -29,4 +29,25 @@ public class BillDto {
         int patientsToday,
         int waitingCount
     ) {}
+
+    public record Response(
+        UUID id,
+        String invoiceNumber,
+        String patientName,
+        BigDecimal subtotal,
+        BigDecimal cgst,
+        BigDecimal sgst,
+        BigDecimal total,
+        String paymentMode,
+        String status,
+        String billedAt,
+        List<Item> items
+    ) {
+        public record Item(
+            String description,
+            String hsnSac,
+            BigDecimal amount,
+            BigDecimal gstRate
+        ) {}
+    }
 }

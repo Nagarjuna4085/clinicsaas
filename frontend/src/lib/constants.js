@@ -12,6 +12,7 @@ export const NAV_ITEMS = [
   { to: '/', label: 'Dashboard', roles: ALL_ROLES },
   { to: '/appointments', label: 'Appointments', roles: ALL_ROLES },
   { to: '/patients', label: 'Patients', roles: ALL_ROLES },
+  { to: '/billing', label: 'Billing', roles: [ROLES.ADMIN, ROLES.RECEPTIONIST, ROLES.DOCTOR] },
   { to: '/staff', label: 'Staff', roles: ALL_ROLES },
 ]
 

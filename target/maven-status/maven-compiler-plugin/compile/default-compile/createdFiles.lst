@@ -12,6 +12,8 @@ com/clinicflow/config/TenantConnectionProvider.class
 com/clinicflow/dto/AuthDto$AuthResponse.class
 com/clinicflow/repository/tenant/StaffRepository.class
 com/clinicflow/entity/tenant/Prescription.class
+com/clinicflow/controller/BillController.class
+com/clinicflow/dto/BillDto$Response.class
 com/clinicflow/entity/tenant/Bill$BillBuilder.class
 com/clinicflow/entity/tenant/BillItem.class
 com/clinicflow/dto/AppointmentDto.class
@@ -30,6 +32,7 @@ com/clinicflow/entity/tenant/Appointment$AppointmentBuilder.class
 com/clinicflow/controller/StaffController.class
 com/clinicflow/repository/tenant/PatientRepository.class
 com/clinicflow/entity/tenant/Vitals.class
+com/clinicflow/controller/DashboardController.class
 com/clinicflow/dto/ClinicDto$RegisterRequest.class
 com/clinicflow/dto/AppointmentDto$StatusUpdate.class
 com/clinicflow/repository/tenant/BillRepository.class
@@ -50,6 +53,7 @@ com/clinicflow/dto/ClinicDto$RegisterResponse.class
 com/clinicflow/entity/tenant/Bill.class
 com/clinicflow/entity/global/Tenant.class
 com/clinicflow/entity/tenant/PrescriptionItem.class
+com/clinicflow/service/DashboardService.class
 com/clinicflow/dto/PatientDto$Response.class
 com/clinicflow/controller/AppointmentController.class
 com/clinicflow/config/TenantSchemaResolver.class
@@ -59,8 +63,10 @@ com/clinicflow/entity/tenant/Prescription$PrescriptionBuilder.class
 com/clinicflow/service/AppointmentService.class
 com/clinicflow/security/JwtUtil.class
 com/clinicflow/entity/tenant/Patient.class
+com/clinicflow/dto/BillDto$Response$Item.class
 com/clinicflow/dto/StaffDto$CreateRequest.class
 com/clinicflow/entity/tenant/BillItem$BillItemBuilder.class
+com/clinicflow/service/BillService.class
 com/clinicflow/service/TenantProvisioningService.class
 com/clinicflow/dto/StaffDto.class
 com/clinicflow/config/HibernateConfig.class

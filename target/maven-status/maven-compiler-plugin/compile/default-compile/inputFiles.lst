@@ -1,4 +1,6 @@
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/repository/tenant/AppointmentRepository.java
+/Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/controller/BillController.java
+/Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/service/DashboardService.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/entity/tenant/Prescription.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/repository/global/StaffDirectoryRepository.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/service/TenantProvisioningService.java
@@ -8,6 +10,7 @@
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/dto/PatientDto.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/entity/tenant/Bill.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/controller/AuthController.java
+/Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/service/BillService.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/repository/tenant/PrescriptionRepository.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/dto/PrescriptionDto.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/context/TenantContext.java
@@ -39,5 +42,6 @@
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/controller/PatientController.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/dto/AppointmentDto.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/config/HibernateConfig.java
+/Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/controller/DashboardController.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/entity/global/StaffDirectory.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/repository/tenant/PatientRepository.java
