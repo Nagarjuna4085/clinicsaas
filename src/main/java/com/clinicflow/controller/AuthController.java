@@ -8,6 +8,9 @@ import com.clinicflow.repository.global.TenantRepository;
 import com.clinicflow.repository.tenant.StaffRepository;
 import com.clinicflow.security.JwtUtil;
 import com.clinicflow.context.TenantContext;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +23,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * POST /api/auth/send-otp   → sends OTP via MSG91
  * POST /api/auth/verify-otp → verifies OTP, returns JWT
  */
+@Tag(name = "Auth", description = "Phone OTP login. Public — no JWT required.")
+@SecurityRequirements // overrides the global bearerAuth: these endpoints are public
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -45,6 +50,7 @@ public class AuthController {
         this.otpExpiryMs = otpExpiryMinutes * 60_000L;
     }
 
+    @Operation(summary = "Send OTP", description = "Generates a 6-digit OTP for the phone. In this MVP the code is printed to the server console (MSG91 not wired). OTP is single-use and expires in 10 minutes.")
     @PostMapping("/send-otp")
     public ResponseEntity<?> sendOtp(@Valid @RequestBody AuthDto.SendOtpRequest req) {
         // In MVP, log OTP to console. In production, call MSG91.
@@ -56,6 +62,7 @@ public class AuthController {
         return ResponseEntity.ok(Map.of("message", "OTP sent"));
     }
 
+    @Operation(summary = "Verify OTP → JWT", description = "Validates the OTP, resolves the staff's clinic via the global directory (fallback: owner phone), and returns a JWT plus role/name/clinic. Use the token via the Authorize button.")
     @PostMapping("/verify-otp")
     public ResponseEntity<?> verifyOtp(@Valid @RequestBody AuthDto.VerifyOtpRequest req) {
         OtpEntry stored = otpStore.get(req.phone());

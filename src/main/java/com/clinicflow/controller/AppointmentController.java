@@ -2,6 +2,8 @@ package com.clinicflow.controller;
 
 import com.clinicflow.dto.AppointmentDto;
 import com.clinicflow.service.AppointmentService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -9,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
+@Tag(name = "Appointments", description = "Daily token queue: book visits, view the queue, update status")
 @RestController
 @RequestMapping("/api/appointments")
 public class AppointmentController {
@@ -19,7 +22,8 @@ public class AppointmentController {
         this.appointmentService = appointmentService;
     }
 
-    // Create appointment + issue token
+    @Operation(summary = "Book an appointment + issue token",
+        description = "Registers a patient into today's queue, assigns the next token number for the doctor, and auto-creates the OP-fee bill. Roles: RECEPTIONIST, ADMIN.")
     @PostMapping
     @PreAuthorize("hasAnyRole('RECEPTIONIST','ADMIN')")
     public ResponseEntity<AppointmentDto.QueueItem> create(
@@ -27,14 +31,14 @@ public class AppointmentController {
         return ResponseEntity.ok(appointmentService.createAppointment(req));
     }
 
-    // Today's full queue (receptionist view)
+    @Operation(summary = "Today's full queue", description = "All of today's appointments ordered by token. Roles: RECEPTIONIST, ADMIN, DOCTOR, NURSE.")
     @GetMapping("/today")
     @PreAuthorize("hasAnyRole('RECEPTIONIST','ADMIN','DOCTOR','NURSE')")
     public ResponseEntity<List<AppointmentDto.QueueItem>> today() {
         return ResponseEntity.ok(appointmentService.getAllTodaysAppointments());
     }
 
-    // Doctor's personal queue
+    @Operation(summary = "Doctor's personal queue", description = "Today's appointments for one doctor, ordered by token. Roles: DOCTOR, RECEPTIONIST, ADMIN.")
     @GetMapping("/today/doctor/{doctorId}")
     @PreAuthorize("hasAnyRole('DOCTOR','RECEPTIONIST','ADMIN')")
     public ResponseEntity<List<AppointmentDto.QueueItem>> doctorQueue(
@@ -42,7 +46,7 @@ public class AppointmentController {
         return ResponseEntity.ok(appointmentService.getTodaysQueue(doctorId));
     }
 
-    // Update appointment status (CONSULTING / COMPLETED / CANCELLED)
+    @Operation(summary = "Update appointment status", description = "Move an appointment to CONSULTING / COMPLETED / CANCELLED. Roles: DOCTOR, RECEPTIONIST, ADMIN.")
     @PatchMapping("/{id}/status")
     @PreAuthorize("hasAnyRole('DOCTOR','RECEPTIONIST','ADMIN')")
     public ResponseEntity<AppointmentDto.QueueItem> updateStatus(

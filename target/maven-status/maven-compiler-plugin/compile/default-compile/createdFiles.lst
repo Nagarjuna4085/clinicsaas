@@ -33,6 +33,7 @@ com/clinicflow/entity/tenant/Vitals.class
 com/clinicflow/dto/ClinicDto$RegisterRequest.class
 com/clinicflow/dto/AppointmentDto$StatusUpdate.class
 com/clinicflow/repository/tenant/BillRepository.class
+com/clinicflow/config/OpenApiConfig.class
 com/clinicflow/dto/BillDto$CreateRequest.class
 com/clinicflow/dto/AuthDto.class
 com/clinicflow/dto/PrescriptionDto.class

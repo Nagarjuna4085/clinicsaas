@@ -8,6 +8,9 @@ import com.clinicflow.entity.tenant.Staff;
 import com.clinicflow.repository.global.StaffDirectoryRepository;
 import com.clinicflow.repository.tenant.StaffRepository;
 import com.clinicflow.service.TenantProvisioningService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +23,8 @@ import org.springframework.web.bind.annotation.*;
  * called it — so a brand-new clinic had no way to register and OTP login would
  * always fail with "No clinic found for this phone".
  */
+@Tag(name = "Clinic Onboarding", description = "Public self-service clinic signup (provisions a tenant schema). No JWT required.")
+@SecurityRequirements
 @RestController
 @RequestMapping("/api/public/clinics")
 public class ClinicController {
@@ -36,6 +41,7 @@ public class ClinicController {
         this.directoryRepo = directoryRepo;
     }
 
+    @Operation(summary = "Register a new clinic", description = "Provisions a dedicated PostgreSQL schema, runs the tenant migrations, creates the owner staff record, and registers the owner phone in the global directory so they can OTP-login.")
     @PostMapping("/register")
     public ResponseEntity<ClinicDto.RegisterResponse> register(
             @Valid @RequestBody ClinicDto.RegisterRequest req) {

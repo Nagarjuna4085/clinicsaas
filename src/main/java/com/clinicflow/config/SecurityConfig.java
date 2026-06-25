@@ -34,7 +34,12 @@ public class SecurityConfig {
                 .requestMatchers(
                     "/api/auth/**",
                     "/api/public/**",
-                    "/actuator/health"
+                    "/actuator/health",
+                    // Swagger / OpenAPI docs
+                    "/swagger-ui/**",
+                    "/swagger-ui.html",
+                    "/v3/api-docs/**",
+                    "/v3/api-docs.yaml"
                 ).permitAll()
                 // Everything else requires a valid JWT
                 .anyRequest().authenticated()
