@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { getTodayQueue, updateAppointmentStatus } from './api'
+import { getTodayQueue, getDoctorQueue, updateAppointmentStatus } from './api'
 import BookAppointmentModal from './BookAppointmentModal'
 import { Card, CardHeader } from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
@@ -30,12 +30,18 @@ export default function AppointmentsPage() {
   const toast = useToast()
   const qc = useQueryClient()
   const role = useAuthStore((s) => s.role)
+  const staffId = useAuthStore((s) => s.staffId)
   const canBook = role === ROLES.ADMIN || role === ROLES.RECEPTIONIST
   const canConsult = [ROLES.ADMIN, ROLES.DOCTOR, ROLES.NURSE].includes(role)
+  const isDoctor = role === ROLES.DOCTOR
+
+  // Doctors default to their own queue; admin/reception/nurse see the full queue.
+  const [scope, setScope] = useState(isDoctor ? 'mine' : 'all')
+  const mine = isDoctor && scope === 'mine' && staffId
 
   const { data, isLoading, isError, error } = useQuery({
-    queryKey: ['appointments', 'today'],
-    queryFn: getTodayQueue,
+    queryKey: ['appointments', mine ? `doctor:${staffId}` : 'today'],
+    queryFn: () => (mine ? getDoctorQueue(staffId) : getTodayQueue()),
   })
 
   const statusMutation = useMutation({
@@ -55,9 +61,29 @@ export default function AppointmentsPage() {
     <div className="space-y-4">
       <Card>
         <CardHeader
-          title="Today's queue"
+          title={mine ? 'My queue today' : "Today's queue"}
           subtitle="Live token board for today"
-          action={canBook ? <Button onClick={() => setOpen(true)}>+ Book appointment</Button> : null}
+          action={
+            <div className="flex items-center gap-2">
+              {isDoctor && (
+                <div className="inline-flex overflow-hidden rounded-lg border border-slate-300 text-sm">
+                  <button
+                    className={`px-3 py-1.5 ${scope === 'mine' ? 'bg-brand-600 text-white' : 'bg-white text-slate-600'}`}
+                    onClick={() => setScope('mine')}
+                  >
+                    My queue
+                  </button>
+                  <button
+                    className={`px-3 py-1.5 ${scope === 'all' ? 'bg-brand-600 text-white' : 'bg-white text-slate-600'}`}
+                    onClick={() => setScope('all')}
+                  >
+                    All
+                  </button>
+                </div>
+              )}
+              {canBook && <Button onClick={() => setOpen(true)}>+ Book appointment</Button>}
+            </div>
+          }
         />
         <div className="flex flex-wrap gap-2">
           {['WAITING', 'CONSULTING', 'COMPLETED', 'CANCELLED'].map((s) => (

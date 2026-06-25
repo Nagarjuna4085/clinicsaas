@@ -6,7 +6,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
@@ -38,11 +41,19 @@ public class AppointmentController {
         return ResponseEntity.ok(appointmentService.getAllTodaysAppointments());
     }
 
-    @Operation(summary = "Doctor's personal queue", description = "Today's appointments for one doctor, ordered by token. Roles: DOCTOR, RECEPTIONIST, ADMIN.")
+    @Operation(summary = "Doctor's personal queue", description = "Today's appointments for one doctor, ordered by token. A DOCTOR may only request their own queue; ADMIN/RECEPTIONIST may request any doctor's.")
     @GetMapping("/today/doctor/{doctorId}")
     @PreAuthorize("hasAnyRole('DOCTOR','RECEPTIONIST','ADMIN')")
     public ResponseEntity<List<AppointmentDto.QueueItem>> doctorQueue(
             @PathVariable UUID doctorId) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        boolean privileged = auth.getAuthorities().stream()
+            .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN")
+                        || a.getAuthority().equals("ROLE_RECEPTIONIST"));
+        // A plain doctor can only see their own queue (id is the JWT subject).
+        if (!privileged && !doctorId.toString().equals(auth.getName())) {
+            throw new AccessDeniedException("You can only view your own queue");
+        }
         return ResponseEntity.ok(appointmentService.getTodaysQueue(doctorId));
     }
 
