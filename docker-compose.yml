@@ -1,0 +1,55 @@
+# Full local stack: Postgres + backend API + frontend.
+# Usage:  docker compose up --build
+# Then open http://localhost:5173  (API at http://localhost:8080)
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: clinicflow
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d clinicflow"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/clinicflow
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      # CHANGE THIS in any real deployment (>=32 random chars).
+      JWT_SECRET: change-me-please-32-chars-minimum-secret
+      # Optional integrations — leave blank to run in fallback/log mode:
+      MSG91_AUTH_KEY: ""
+      GUPSHUP_API_KEY: ""
+      RAZORPAY_KEY_ID: ""
+      RAZORPAY_KEY_SECRET: ""
+      RAZORPAY_WEBHOOK_SECRET: ""
+      # Dev-only subscription simulate controls (never enable in prod):
+      DEV_TOOLS: "true"
+    ports:
+      - "8080:8080"
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        # Browser runs on the host, so it reaches the backend via localhost.
+        VITE_API_BASE_URL: http://localhost:8080
+    depends_on:
+      - backend
+    ports:
+      - "5173:80"
+
+volumes:
+  pgdata:

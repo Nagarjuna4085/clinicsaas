@@ -1,0 +1,9 @@
+target/
+frontend/
+docs/
+.git/
+.github/
+.idea/
+*.iml
+*.md
+node_modules/
