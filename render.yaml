@@ -17,7 +17,7 @@ services:
     plan: free                 # free spins down when idle; upgrade for prod
     healthCheckPath: /actuator/health
     # Only rebuild the API when backend files change.
-    buildFilters:
+    buildFilter:
       paths:
         - src/**
         - pom.xml
@@ -70,7 +70,7 @@ services:
     buildCommand: cd frontend && npm ci && npm run build
     staticPublishPath: frontend/dist
     # Only rebuild the frontend when frontend files change.
-    buildFilters:
+    buildFilter:
       paths:
         - frontend/**
     envVars:
