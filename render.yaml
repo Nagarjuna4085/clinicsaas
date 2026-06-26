@@ -1,0 +1,73 @@
+# Render blueprint — deploys Postgres + backend API + frontend.
+# In Render: New → Blueprint → connect this repo. Review and apply.
+# Docs: https://render.com/docs/blueprint-spec
+databases:
+  - name: clinicflow-db
+    databaseName: clinicflow
+    plan: free                 # upgrade to "basic"/"standard" for real use
+    postgresMajorVersion: "16"
+
+services:
+  # ---------- Backend API (Docker) ----------
+  - type: web
+    name: clinicflow-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: free                 # free spins down when idle; upgrade for prod
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: DB_HOST
+        fromDatabase: { name: clinicflow-db, property: host }
+      - key: DB_PORT
+        fromDatabase: { name: clinicflow-db, property: port }
+      - key: DB_NAME
+        fromDatabase: { name: clinicflow-db, property: database }
+      - key: DB_USERNAME
+        fromDatabase: { name: clinicflow-db, property: user }
+      - key: DB_PASSWORD
+        fromDatabase: { name: clinicflow-db, property: password }
+      - key: JWT_SECRET
+        generateValue: true     # Render generates a strong secret
+      - key: DEV_TOOLS
+        value: "false"
+      - key: APP_CORS_ORIGINS
+        value: https://clinicflow-frontend.onrender.com
+      # Integrations — set these in the dashboard (sync:false = not in repo)
+      - key: RAZORPAY_KEY_ID
+        sync: false
+      - key: RAZORPAY_KEY_SECRET
+        sync: false
+      - key: RAZORPAY_WEBHOOK_SECRET
+        sync: false
+      - key: RAZORPAY_PLAN_STARTER
+        sync: false
+      - key: RAZORPAY_PLAN_CLINIC
+        sync: false
+      - key: RAZORPAY_PLAN_PRO
+        sync: false
+      - key: RAZORPAY_PLAN_HOSPITAL
+        sync: false
+      - key: MSG91_AUTH_KEY
+        sync: false
+      - key: MSG91_TEMPLATE_ID
+        sync: false
+      - key: GUPSHUP_API_KEY
+        sync: false
+      - key: GUPSHUP_SOURCE
+        sync: false
+
+  # ---------- Frontend (static site) ----------
+  - type: web
+    name: clinicflow-frontend
+    runtime: static
+    buildCommand: cd frontend && npm ci && npm run build
+    staticPublishPath: frontend/dist
+    envVars:
+      # Baked at build time; must match the API service URL.
+      - key: VITE_API_BASE_URL
+        value: https://clinicflow-api.onrender.com
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html   # SPA fallback for React Router
