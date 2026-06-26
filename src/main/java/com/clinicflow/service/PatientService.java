@@ -64,7 +64,8 @@ public class PatientService {
                 .build();
         }
         patient = patientRepo.save(patient);
-        auditService.log(isNew ? "CREATE" : "UPDATE", "PATIENT", patient.getId().toString(), null);
+        String pid = patient.getId() != null ? patient.getId().toString() : null;
+        auditService.log(isNew ? "CREATE" : "UPDATE", "PATIENT", pid, null);
         return toResponse(patient);
     }
 
