@@ -55,7 +55,12 @@ public class ClinicController {
     public ResponseEntity<ClinicDto.RegisterResponse> register(
             @Valid @RequestBody ClinicDto.RegisterRequest req) {
 
-        // 0. Verify the one-time OTP for the owner phone.
+        // 0a. Consent is required to create a clinic (we store health data).
+        if (!req.consent()) {
+            throw new BadRequestException("You must accept the Terms of Service and Privacy Policy");
+        }
+
+        // 0b. Verify the one-time OTP for the owner phone.
         String otp = otpStore.get(req.ownerPhone());
         if (otp == null || !otp.equals(req.otp())) {
             throw new BadRequestException("Invalid or expired OTP");

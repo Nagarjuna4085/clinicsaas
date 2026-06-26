@@ -17,7 +17,7 @@ export default function RegisterPatientModal({ open, onClose, onCreated }) {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm({ resolver: zodResolver(patientSchema) })
+  } = useForm({ resolver: zodResolver(patientSchema), defaultValues: { consent: false } })
 
   const mutation = useMutation({
     mutationFn: (values) => {
@@ -55,6 +55,13 @@ export default function RegisterPatientModal({ open, onClose, onCreated }) {
         <Input label="ABHA ID" error={errors.abhaId?.message} {...register('abhaId')} />
         <div className="col-span-2">
           <Input label="Allergies" error={errors.allergies?.message} {...register('allergies')} />
+        </div>
+        <div className="col-span-2">
+          <label className="flex items-start gap-2 text-sm text-slate-700">
+            <input type="checkbox" className="mt-0.5 h-4 w-4 rounded border-slate-300" {...register('consent')} />
+            <span>Patient consents to storing their health information for treatment and records.</span>
+          </label>
+          {errors.consent && <p className="mt-1 text-xs text-red-600">{errors.consent.message}</p>}
         </div>
         <div className="col-span-2 flex justify-end gap-2 pt-2">
           <Button variant="secondary" onClick={onClose}>

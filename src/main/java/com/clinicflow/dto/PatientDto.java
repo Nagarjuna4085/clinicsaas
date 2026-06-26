@@ -12,7 +12,8 @@ public class PatientDto {
         String gender,
         String bloodGroup,
         String abhaId,
-        String allergies
+        String allergies,
+        boolean consent     // patient consented to storing their health data
     ) {}
 
     public record Response(

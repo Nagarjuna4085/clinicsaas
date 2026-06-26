@@ -25,4 +25,6 @@ public interface BillRepository extends JpaRepository<Bill, UUID> {
     // COUNT(*), which could produce duplicate invoice numbers under load.
     @Query(value = "SELECT nextval('bill_invoice_seq')", nativeQuery = true)
     long nextInvoiceSeq();
+
+    List<Bill> findByPatientId(UUID patientId);
 }

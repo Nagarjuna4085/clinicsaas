@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Tag(name = "Patients", description = "Patient registry: register/find, search, lookup by phone")
@@ -59,5 +60,20 @@ public class PatientController {
     @PreAuthorize("hasAnyRole('RECEPTIONIST','ADMIN','DOCTOR','NURSE')")
     public ResponseEntity<PatientDto.Response> get(@PathVariable UUID id) {
         return ResponseEntity.ok(patientService.getById(id));
+    }
+
+    @Operation(summary = "Export patient data (DPDP)", description = "Returns the patient's full data bundle (profile, visits, bills). Role: ADMIN.")
+    @GetMapping("/{id}/export")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Map<String, Object>> export(@PathVariable UUID id) {
+        return ResponseEntity.ok(patientService.export(id));
+    }
+
+    @Operation(summary = "Erase patient PII (DPDP)", description = "Anonymizes the patient's personal data while retaining clinical/financial records for legal retention. Role: ADMIN.")
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> erase(@PathVariable UUID id) {
+        patientService.anonymize(id);
+        return ResponseEntity.noContent().build();
     }
 }

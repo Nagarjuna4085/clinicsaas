@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.Statement;
+import java.time.OffsetDateTime;
 
 /**
  * Provisions a new clinic:
@@ -41,7 +42,7 @@ public class TenantProvisioningService {
         createSchema(schemaName);
 
         // 3. Run Flyway migrations on the new schema
-        runMigrations(schemaName);
+        migrate(schemaName);
 
         // 4. Save tenant record in global.tenants
         Tenant tenant = Tenant.builder()
@@ -51,6 +52,7 @@ public class TenantProvisioningService {
             .city(city)
             .plan(plan)
             .status("trial")
+            .consentAt(OffsetDateTime.now())   // owner accepted Terms/Privacy at signup
             .build();
 
         return tenantRepository.save(tenant);
@@ -66,7 +68,8 @@ public class TenantProvisioningService {
         }
     }
 
-    private void runMigrations(String schemaName) {
+    /** Applies all tenant migrations to a schema. Idempotent — safe to re-run. */
+    public void migrate(String schemaName) {
         Flyway flyway = Flyway.configure()
             .dataSource(dataSource)
             .schemas(schemaName)

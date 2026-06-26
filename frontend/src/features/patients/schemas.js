@@ -12,4 +12,5 @@ export const patientSchema = z.object({
   bloodGroup: z.string().optional(),
   abhaId: z.string().optional(),
   allergies: z.string().optional(),
+  consent: z.boolean().refine((v) => v === true, 'Patient consent is required'),
 })

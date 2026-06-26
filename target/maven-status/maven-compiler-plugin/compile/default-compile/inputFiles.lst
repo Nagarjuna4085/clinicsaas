@@ -3,6 +3,7 @@
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/entity/tenant/Consultation.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/service/Msg91Service.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/entity/tenant/BillItem.java
+/Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/controller/AuditController.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/service/StaffService.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/dto/PatientDto.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/entity/tenant/Bill.java
@@ -12,6 +13,7 @@
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/context/TenantContext.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/config/SecurityConfig.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/security/JwtAuthFilter.java
+/Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/service/AuditService.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/dto/BillDto.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/repository/tenant/StaffRepository.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/config/RazorpayProperties.java
@@ -29,6 +31,7 @@
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/ClinicFlowApplication.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/config/TenantConnectionProvider.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/controller/PatientController.java
+/Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/config/TenantMigrationRunner.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/config/HibernateConfig.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/controller/DashboardController.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/repository/tenant/VitalsRepository.java
@@ -48,9 +51,11 @@
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/controller/AppointmentController.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/service/RazorpayService.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/exception/RateLimitExceededException.java
+/Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/repository/tenant/AuditLogRepository.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/repository/tenant/BillRepository.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/service/AppointmentService.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/service/PrescriptionService.java
+/Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/dto/AuditDto.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/exception/GlobalExceptionHandler.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/exception/BadRequestException.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/entity/tenant/Appointment.java
@@ -64,6 +69,7 @@
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/controller/StaffController.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/repository/tenant/ConsultationRepository.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/service/OtpStore.java
+/Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/entity/tenant/AuditLog.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/controller/ClinicProfileController.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/security/JwtUtil.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/main/java/com/clinicflow/service/WhatsAppService.java

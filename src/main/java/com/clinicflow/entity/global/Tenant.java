@@ -45,6 +45,9 @@ public class Tenant {
     @Column(name = "created_at")
     private OffsetDateTime createdAt = OffsetDateTime.now();
 
+    @Column(name = "consent_at")
+    private OffsetDateTime consentAt;   // when the owner accepted Terms/Privacy
+
     @PrePersist
     public void prePersist() {
         if (createdAt == null) createdAt = OffsetDateTime.now();

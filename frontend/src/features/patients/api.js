@@ -14,3 +14,9 @@ export const getPatientByPhone = (phone) =>
 
 export const getPatient = (id) =>
   api.get(`/api/patients/${id}`).then((r) => r.data)
+
+export const exportPatient = (id) =>
+  api.get(`/api/patients/${id}/export`).then((r) => r.data)
+
+export const erasePatient = (id) =>
+  api.delete(`/api/patients/${id}`).then((r) => r.data)

@@ -18,7 +18,7 @@ export default function SignupPage() {
 
   const detailsForm = useForm({
     resolver: zodResolver(signupDetailsSchema),
-    defaultValues: { plan: 'starter', alsoDoctor: false },
+    defaultValues: { plan: 'starter', alsoDoctor: false, consent: false },
   })
   const verifyForm = useForm({ resolver: zodResolver(signupVerifySchema) })
   const alsoDoctor = detailsForm.watch('alsoDoctor')
@@ -79,6 +79,15 @@ export default function SignupPage() {
                 <Input label="Specialty" placeholder="e.g. General Physician" {...detailsForm.register('specialty')} />
               </>
             )}
+            <div className="sm:col-span-2">
+              <label className="flex items-start gap-2 text-sm text-slate-700">
+                <input type="checkbox" className="mt-0.5 h-4 w-4 rounded border-slate-300" {...detailsForm.register('consent')} />
+                <span>I agree to the Terms of Service and Privacy Policy, and I'm authorised to register this clinic.</span>
+              </label>
+              {detailsForm.formState.errors.consent && (
+                <p className="mt-1 text-xs text-red-600">{detailsForm.formState.errors.consent.message}</p>
+              )}
+            </div>
             <div className="sm:col-span-2">
               <Button type="submit" className="w-full" loading={otpMutation.isPending}>Send OTP</Button>
             </div>

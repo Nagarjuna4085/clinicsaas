@@ -22,7 +22,8 @@ public class ClinicDto {
         // The owner is always created as ADMIN. If they also consult, they pass
         // a specialty (and optionally NMC reg) and become bookable as a provider.
         String regNumber,
-        String specialty
+        String specialty,
+        boolean consent     // owner accepted Terms of Service & Privacy Policy
     ) {}
 
     public record RegisterResponse(

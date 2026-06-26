@@ -32,6 +32,7 @@ export const signupDetailsSchema = z.object({
   alsoDoctor: z.boolean().optional(),
   regNumber: z.string().optional(),
   specialty: z.string().optional(),
+  consent: z.boolean().refine((v) => v === true, 'You must accept the Terms & Privacy Policy'),
 })
 
 // Step 2 of signup — OTP + chosen password.

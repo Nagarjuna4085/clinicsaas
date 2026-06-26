@@ -46,4 +46,10 @@ public class Patient {
     @Builder.Default
     @Column(name = "created_at")
     private OffsetDateTime createdAt = OffsetDateTime.now();
+
+    @Column(name = "consent_at")
+    private OffsetDateTime consentAt;   // when the patient consented to data storage
+
+    @Column(name = "deleted_at")
+    private OffsetDateTime deletedAt;   // set when PII is erased (right to erasure)
 }
