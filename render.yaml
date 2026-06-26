@@ -32,7 +32,7 @@ services:
       - key: DEV_TOOLS
         value: "false"
       - key: APP_CORS_ORIGINS
-        value: https://clinicflow-frontend.onrender.com
+        value: https://clinicflow-frontend-9bbq.onrender.com
       # Integrations — set these in the dashboard (sync:false = not in repo)
       - key: RAZORPAY_KEY_ID
         sync: false
@@ -66,7 +66,7 @@ services:
     envVars:
       # Baked at build time; must match the API service URL.
       - key: VITE_API_BASE_URL
-        value: https://clinicflow-api.onrender.com
+        value: https://clinicflow-api-fqd8.onrender.com
     routes:
       - type: rewrite
         source: /*
