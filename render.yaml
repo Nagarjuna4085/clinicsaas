@@ -16,6 +16,12 @@ services:
     dockerContext: .
     plan: free                 # free spins down when idle; upgrade for prod
     healthCheckPath: /actuator/health
+    # Only rebuild the API when backend files change.
+    buildFilters:
+      paths:
+        - src/**
+        - pom.xml
+        - Dockerfile
     envVars:
       - key: DB_HOST
         fromDatabase: { name: clinicflow-db, property: host }
@@ -32,7 +38,7 @@ services:
       - key: DEV_TOOLS
         value: "false"
       - key: APP_CORS_ORIGINS
-        value: https://clinicflow-frontend.onrender.com
+        value: https://clinicflow-frontend-9bbq.onrender.com
       # Integrations — set these in the dashboard (sync:false = not in repo)
       - key: RAZORPAY_KEY_ID
         sync: false
@@ -63,10 +69,14 @@ services:
     runtime: static
     buildCommand: cd frontend && npm ci && npm run build
     staticPublishPath: frontend/dist
+    # Only rebuild the frontend when frontend files change.
+    buildFilters:
+      paths:
+        - frontend/**
     envVars:
       # Baked at build time; must match the API service URL.
       - key: VITE_API_BASE_URL
-        value: https://clinicflow-api.onrender.com
+        value: https://clinicflow-api-fqd8.onrender.com
     routes:
       - type: rewrite
         source: /*
