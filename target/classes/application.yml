@@ -1,9 +1,22 @@
 server:
-  port: 8080
+  port: ${PORT:8080}   # hosts like Render inject PORT
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  health:
+    # Redis is optional (only used when app.otp.store=redis); don't let its
+    # health check drag /actuator/health DOWN when Redis isn't running.
+    redis:
+      enabled: false
 
 spring:
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/clinicflow}
+    # DB_URL wins if set; otherwise composed from host/port/name (managed DBs
+    # like Render expose these separately).
+    url: ${DB_URL:jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:clinicflow}}
     username: ${DB_USERNAME:nagarjunasanam}
     password: ${DB_PASSWORD:}
     driver-class-name: org.postgresql.Driver
@@ -52,6 +65,11 @@ app:
   jwt:
     secret: ${JWT_SECRET:dev-only-change-me-32char-min-secret-key}
     expiration-ms: ${JWT_EXPIRATION_MS:86400000}   # 24 hours
+
+  # Comma-separated allowed CORS origin patterns (set APP_CORS_ORIGINS in prod
+  # to your deployed frontend URL).
+  cors:
+    origins: ${APP_CORS_ORIGINS:http://localhost:*,https://*.onrender.com,https://*.clinicflow.in}
 
   otp:
     expiry-minutes: 10
