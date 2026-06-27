@@ -88,6 +88,14 @@ export default function LoginPage() {
           New clinic?{' '}
           <Link to="/signup" className="font-medium text-brand-600 hover:underline">Register here</Link>
         </p>
+
+        <div className="mt-6 flex flex-wrap justify-center gap-x-4 gap-y-1 border-t border-slate-100 pt-4 text-xs text-slate-400">
+          <Link to="/pricing" className="hover:text-brand-600">Pricing</Link>
+          <Link to="/privacy" className="hover:text-brand-600">Privacy</Link>
+          <Link to="/terms" className="hover:text-brand-600">Terms</Link>
+          <Link to="/refund" className="hover:text-brand-600">Refunds</Link>
+          <Link to="/contact" className="hover:text-brand-600">Contact</Link>
+        </div>
       </div>
     </div>
   )

@@ -8,6 +8,11 @@ import LoginPage from '../features/auth/LoginPage'
 import SignupPage from '../features/auth/SignupPage'
 import ForgotPasswordPage from '../features/auth/ForgotPasswordPage'
 import SuspendedPage from '../features/subscription/SuspendedPage'
+import PricingPage from '../features/legal/PricingPage'
+import PrivacyPage from '../features/legal/PrivacyPage'
+import TermsPage from '../features/legal/TermsPage'
+import RefundPage from '../features/legal/RefundPage'
+import ContactPage from '../features/legal/ContactPage'
 import DashboardPage from '../features/dashboard/DashboardPage'
 import PatientsPage from '../features/patients/PatientsPage'
 import PatientDetailPage from '../features/patients/PatientDetailPage'
@@ -26,6 +31,12 @@ export default function App() {
       <Route path="/signup" element={<SignupPage />} />
       <Route path="/forgot" element={<ForgotPasswordPage />} />
       <Route path="/suspended" element={<SuspendedPage />} />
+      {/* Public legal/marketing pages (required for payment KYC) */}
+      <Route path="/pricing" element={<PricingPage />} />
+      <Route path="/privacy" element={<PrivacyPage />} />
+      <Route path="/terms" element={<TermsPage />} />
+      <Route path="/refund" element={<RefundPage />} />
+      <Route path="/contact" element={<ContactPage />} />
 
       {/* Authenticated app shell */}
       <Route
