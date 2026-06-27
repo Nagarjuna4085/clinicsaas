@@ -57,14 +57,18 @@ public class AppointmentService {
         OffsetDateTime scheduledAt = null;
         String visitType = req.visitType() != null ? req.visitType() : "WALKIN";
         if (req.scheduledAt() != null && !req.scheduledAt().isBlank()) {
+            LocalDateTime ldt;
             try {
-                LocalDateTime ldt = LocalDateTime.parse(req.scheduledAt());
-                scheduledAt = ldt.atOffset(OffsetDateTime.now().getOffset());
-                visitDate = ldt.toLocalDate();
-                visitType = "SCHEDULED";
+                ldt = LocalDateTime.parse(req.scheduledAt());
             } catch (Exception e) {
                 throw new BadRequestException("Invalid scheduled date/time");
             }
+            scheduledAt = ldt.atOffset(OffsetDateTime.now().getOffset());
+            if (scheduledAt.isBefore(OffsetDateTime.now())) {
+                throw new BadRequestException("Scheduled time must be in the future");
+            }
+            visitDate = ldt.toLocalDate();
+            visitType = "SCHEDULED";
         }
 
         short token = appointmentRepo.nextTokenNumber(visitDate, req.doctorId());

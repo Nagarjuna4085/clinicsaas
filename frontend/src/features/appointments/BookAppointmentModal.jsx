@@ -19,6 +19,10 @@ export default function BookAppointmentModal({ open, onClose }) {
   const [query, setQuery] = useState('')
   const [patient, setPatient] = useState(null)
   const [scheduled, setScheduled] = useState(false)
+  // Local "now" in yyyy-MM-ddTHH:mm for the datetime-local min attribute.
+  const minDateTime = new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
+    .toISOString()
+    .slice(0, 16)
 
   const {
     register,
@@ -164,7 +168,7 @@ export default function BookAppointmentModal({ open, onClose }) {
             Schedule for a later date/time
           </label>
           {scheduled && (
-            <Input type="datetime-local" className="mt-2 max-w-xs" {...register('scheduledAt')} />
+            <Input type="datetime-local" min={minDateTime} className="mt-2 max-w-xs" {...register('scheduledAt')} />
           )}
         </div>
 
