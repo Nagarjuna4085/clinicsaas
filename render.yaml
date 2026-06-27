@@ -39,6 +39,8 @@ services:
         value: "false"
       - key: APP_CORS_ORIGINS
         value: https://clinicflow-frontend-9bbq.onrender.com
+      - key: APP_ENCRYPTION_KEY
+        generateValue: true     # Render generates once; do NOT change after data is written
       # Integrations — set these in the dashboard (sync:false = not in repo)
       - key: RAZORPAY_KEY_ID
         sync: false

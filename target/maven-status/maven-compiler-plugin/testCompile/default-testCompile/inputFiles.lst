@@ -6,4 +6,6 @@
 /Users/nagarjunasanam/Downloads/clinicflow/src/test/java/com/clinicflow/service/PatientServiceTest.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/test/java/com/clinicflow/service/PdfServiceTest.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/test/java/com/clinicflow/service/RazorpayServiceTest.java
+/Users/nagarjunasanam/Downloads/clinicflow/src/test/java/com/clinicflow/config/crypto/FieldCryptoTest.java
+/Users/nagarjunasanam/Downloads/clinicflow/src/test/java/com/clinicflow/MultiTenantRoutingIT.java
 /Users/nagarjunasanam/Downloads/clinicflow/src/test/java/com/clinicflow/security/JwtUtilTest.java

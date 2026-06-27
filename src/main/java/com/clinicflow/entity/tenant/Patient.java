@@ -1,5 +1,6 @@
 package com.clinicflow.entity.tenant;
 
+import com.clinicflow.config.crypto.EncryptedStringConverter;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
@@ -34,14 +35,17 @@ public class Patient {
     @Column(name = "blood_group", length = 5)
     private String bloodGroup;
 
+    @Convert(converter = EncryptedStringConverter.class)
     @Column(columnDefinition = "TEXT")
     private String address;
 
-    @Column(name = "abha_id", length = 20)
-    private String abhaId;              // Govt ABHA health ID
+    @Convert(converter = EncryptedStringConverter.class)
+    @Column(name = "abha_id")
+    private String abhaId;              // Govt ABHA health ID (encrypted at rest)
 
+    @Convert(converter = EncryptedStringConverter.class)
     @Column(columnDefinition = "TEXT")
-    private String allergies;           // Shown as warning during Rx
+    private String allergies;           // Shown as warning during Rx (encrypted at rest)
 
     @Builder.Default
     @Column(name = "created_at")

@@ -28,4 +28,5 @@ public interface BillRepository extends JpaRepository<Bill, UUID> {
 
     List<Bill> findByPatientId(UUID patientId);
     List<Bill> findByAppointmentId(UUID appointmentId);
+    List<Bill> findByBilledAtGreaterThanEqual(OffsetDateTime start);
 }

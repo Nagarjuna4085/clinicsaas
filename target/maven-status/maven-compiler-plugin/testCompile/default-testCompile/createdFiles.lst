@@ -2,6 +2,8 @@ com/clinicflow/service/RateLimiterTest.class
 com/clinicflow/service/SubscriptionServiceTest.class
 com/clinicflow/service/PdfServiceTest.class
 com/clinicflow/security/JwtUtilTest.class
+com/clinicflow/MultiTenantRoutingIT.class
+com/clinicflow/config/crypto/FieldCryptoTest.class
 com/clinicflow/service/RazorpayServiceTest.class
 com/clinicflow/service/StaffServiceTest.class
 com/clinicflow/exception/GlobalExceptionHandlerTest.class

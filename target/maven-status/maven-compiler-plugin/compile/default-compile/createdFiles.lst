@@ -5,6 +5,7 @@ com/clinicflow/dto/PrescriptionDto$Response$ItemResponse.class
 com/clinicflow/dto/BillDto$CreateRequest$LineItem.class
 com/clinicflow/entity/global/Tenant$TenantBuilder.class
 com/clinicflow/dto/PrescriptionDto$CreateRequest$ItemRequest.class
+com/clinicflow/dto/ReportDto$RevenueReport.class
 com/clinicflow/scheduler/FollowUpReminderScheduler.class
 com/clinicflow/service/PdfService$RxLine.class
 com/clinicflow/context/TenantContext.class
@@ -13,6 +14,7 @@ com/clinicflow/dto/AuthDto$AuthResponse.class
 com/clinicflow/dto/StaffDto$UpdateRequest.class
 com/clinicflow/config/TenantMigrationRunner.class
 com/clinicflow/repository/tenant/StaffRepository.class
+com/clinicflow/config/crypto/EncryptedStringConverter.class
 com/clinicflow/entity/tenant/Bill$BillBuilder.class
 com/clinicflow/entity/tenant/BillItem.class
 com/clinicflow/dto/AppointmentDto.class
@@ -67,6 +69,8 @@ com/clinicflow/service/AppointmentService.class
 com/clinicflow/dto/VitalsDto.class
 com/clinicflow/security/JwtUtil.class
 com/clinicflow/exception/NotFoundException.class
+com/clinicflow/controller/ReportController.class
+com/clinicflow/config/crypto/FieldCrypto.class
 com/clinicflow/dto/StaffDto.class
 com/clinicflow/config/HibernateConfig.class
 com/clinicflow/entity/tenant/Staff$StaffBuilder.class
@@ -74,8 +78,11 @@ com/clinicflow/dto/AppointmentDto$QueueItem.class
 com/clinicflow/repository/global/StaffDirectoryRepository.class
 com/clinicflow/dto/PatientDto$Visit.class
 com/clinicflow/dto/VitalsDto$Response.class
+com/clinicflow/dto/ReportDto$DailyPoint.class
+com/clinicflow/dto/ReportDto.class
 com/clinicflow/dto/AuthDto$SetPasswordRequest.class
 com/clinicflow/controller/AuditController.class
+com/clinicflow/config/crypto/EncryptionConfig.class
 com/clinicflow/service/InMemoryOtpStore.class
 com/clinicflow/dto/AuthDto$ResetPasswordRequest.class
 com/clinicflow/entity/tenant/Prescription.class
@@ -114,6 +121,7 @@ com/clinicflow/service/DashboardService.class
 com/clinicflow/service/AuditService.class
 com/clinicflow/entity/tenant/Consultation.class
 com/clinicflow/config/TenantSchemaResolver.class
+com/clinicflow/service/ReportService.class
 com/clinicflow/repository/tenant/ConsultationRepository.class
 com/clinicflow/entity/tenant/Patient.class
 com/clinicflow/dto/BillDto$Response$Item.class

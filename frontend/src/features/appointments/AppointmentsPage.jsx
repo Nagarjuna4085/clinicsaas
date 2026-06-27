@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { getTodayQueue, getDoctorQueue, updateAppointmentStatus } from './api'
+import { getTodayQueue, getDoctorQueue, getUpcoming, updateAppointmentStatus } from './api'
 import BookAppointmentModal from './BookAppointmentModal'
 import { Card, CardHeader } from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
@@ -43,6 +43,8 @@ export default function AppointmentsPage() {
     queryKey: ['appointments', mine ? `doctor:${staffId}` : 'today'],
     queryFn: () => (mine ? getDoctorQueue(staffId) : getTodayQueue()),
   })
+
+  const upcoming = useQuery({ queryKey: ['appointments', 'upcoming'], queryFn: getUpcoming })
 
   const statusMutation = useMutation({
     mutationFn: ({ id, status }) => updateAppointmentStatus(id, status),
@@ -169,6 +171,38 @@ export default function AppointmentsPage() {
           </div>
         )}
       </Card>
+
+      {upcoming.data && upcoming.data.length > 0 && (
+        <Card>
+          <CardHeader title="Upcoming" subtitle="Scheduled appointments for later dates" />
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-slate-200 text-left text-slate-500">
+                  <th className="px-3 py-2">When</th>
+                  <th className="px-3 py-2">Patient</th>
+                  <th className="px-3 py-2">Type</th>
+                  <th className="px-3 py-2">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {upcoming.data.map((a) => (
+                  <tr key={a.id} className="border-b border-slate-100 hover:bg-slate-50">
+                    <td className="px-3 py-2 font-medium text-slate-700">
+                      {a.scheduledAt ? new Date(a.scheduledAt).toLocaleString() : '—'}
+                    </td>
+                    <td className="px-3 py-2">{a.patientName}</td>
+                    <td className="px-3 py-2">{a.visitType}</td>
+                    <td className="px-3 py-2">
+                      <Badge color={statusColor[a.status]}>{a.status}</Badge>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      )}
 
       {canBook && <BookAppointmentModal open={open} onClose={() => setOpen(false)} />}
     </div>

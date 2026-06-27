@@ -31,4 +31,12 @@ public interface AppointmentRepository extends JpaRepository<Appointment, UUID> 
 
     // Patient's visit history
     List<Appointment> findByPatientIdOrderByVisitDateDesc(UUID patientId);
+
+    // Visits since a date (for reports)
+    List<Appointment> findByVisitDateGreaterThanEqual(LocalDate start);
+
+    // Upcoming scheduled appointments (future dates)
+    @Query("SELECT a FROM Appointment a JOIN FETCH a.patient " +
+           "WHERE a.visitDate > :today ORDER BY a.visitDate ASC, a.scheduledAt ASC")
+    List<Appointment> findUpcoming(LocalDate today);
 }

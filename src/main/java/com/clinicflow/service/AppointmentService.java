@@ -9,11 +9,15 @@ import com.clinicflow.entity.tenant.Staff;
 import com.clinicflow.repository.tenant.AppointmentRepository;
 import com.clinicflow.repository.tenant.BillRepository;
 import com.clinicflow.repository.tenant.PatientRepository;
+import com.clinicflow.exception.BadRequestException;
+import com.clinicflow.exception.NotFoundException;
 import com.clinicflow.repository.tenant.StaffRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -43,20 +47,35 @@ public class AppointmentService {
     @Transactional
     public AppointmentDto.QueueItem createAppointment(AppointmentDto.CreateRequest req) {
         Patient patient = patientRepo.findById(req.patientId())
-            .orElseThrow(() -> new RuntimeException("Patient not found"));
+            .orElseThrow(() -> new NotFoundException("Patient not found"));
 
         Staff doctor = staffRepo.findById(req.doctorId())
-            .orElseThrow(() -> new RuntimeException("Doctor not found"));
+            .orElseThrow(() -> new NotFoundException("Doctor not found"));
 
-        // Get next token for today
-        short token = appointmentRepo.nextTokenNumber(LocalDate.now(), req.doctorId());
+        // Walk-in (today) by default, or a future scheduled slot if provided.
+        LocalDate visitDate = LocalDate.now();
+        OffsetDateTime scheduledAt = null;
+        String visitType = req.visitType() != null ? req.visitType() : "WALKIN";
+        if (req.scheduledAt() != null && !req.scheduledAt().isBlank()) {
+            try {
+                LocalDateTime ldt = LocalDateTime.parse(req.scheduledAt());
+                scheduledAt = ldt.atOffset(OffsetDateTime.now().getOffset());
+                visitDate = ldt.toLocalDate();
+                visitType = "SCHEDULED";
+            } catch (Exception e) {
+                throw new BadRequestException("Invalid scheduled date/time");
+            }
+        }
+
+        short token = appointmentRepo.nextTokenNumber(visitDate, req.doctorId());
 
         Appointment appt = Appointment.builder()
             .patient(patient)
             .doctor(doctor)
             .tokenNumber(token)
-            .visitDate(LocalDate.now())
-            .visitType(req.visitType() != null ? req.visitType() : "WALKIN")
+            .visitDate(visitDate)
+            .scheduledAt(scheduledAt)
+            .visitType(visitType)
             .status("WAITING")
             .build();
 
@@ -127,6 +146,13 @@ public class AppointmentService {
         billRepo.save(bill);
     }
 
+    @Transactional(readOnly = true)
+    public List<AppointmentDto.QueueItem> getUpcoming() {
+        return appointmentRepo.findUpcoming(LocalDate.now())
+            .stream().map(this::toQueueItem)
+            .collect(Collectors.toList());
+    }
+
     private AppointmentDto.QueueItem toQueueItem(Appointment a) {
         return new AppointmentDto.QueueItem(
             a.getId(),
@@ -136,7 +162,8 @@ public class AppointmentService {
             a.getPatient().getGender(),
             a.getStatus(),
             a.getVisitType(),
-            a.getCreatedAt().toString()
+            a.getCreatedAt() != null ? a.getCreatedAt().toString() : null,
+            a.getScheduledAt() != null ? a.getScheduledAt().toString() : null
         );
     }
 }

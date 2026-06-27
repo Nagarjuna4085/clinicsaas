@@ -11,7 +11,8 @@ public class AppointmentDto {
         @NotNull UUID doctorId,
         String visitType,   // WALKIN / SCHEDULED / FOLLOWUP
         int opFee,
-        String paymentMode
+        String paymentMode,
+        String scheduledAt  // optional ISO date-time (yyyy-MM-ddTHH:mm) for a future booking
     ) {}
 
     public record QueueItem(
@@ -22,7 +23,8 @@ public class AppointmentDto {
         String gender,
         String status,
         String visitType,
-        String createdAt
+        String createdAt,
+        String scheduledAt
     ) {}
 
     public record StatusUpdate(

@@ -71,6 +71,12 @@ app:
   cors:
     origins: ${APP_CORS_ORIGINS:http://localhost:*,https://*.onrender.com,https://*.clinicflow.in}
 
+  # Field-level encryption key. Leave blank to disable (plaintext). Set a strong
+  # random value (APP_ENCRYPTION_KEY) in production. WARNING: once set and data is
+  # written, do not change/lose it — encrypted fields become unreadable.
+  encryption:
+    key: ${APP_ENCRYPTION_KEY:}
+
   otp:
     expiry-minutes: 10
     length: 6

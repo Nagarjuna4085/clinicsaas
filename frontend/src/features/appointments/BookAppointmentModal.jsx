@@ -18,6 +18,7 @@ export default function BookAppointmentModal({ open, onClose }) {
   const [term, setTerm] = useState('')
   const [query, setQuery] = useState('')
   const [patient, setPatient] = useState(null)
+  const [scheduled, setScheduled] = useState(false)
 
   const {
     register,
@@ -45,9 +46,17 @@ export default function BookAppointmentModal({ open, onClose }) {
   })
 
   const mutation = useMutation({
-    mutationFn: bookAppointment,
+    mutationFn: (values) =>
+      bookAppointment({
+        ...values,
+        // Only send scheduledAt when scheduling for later; otherwise it's a walk-in.
+        scheduledAt: scheduled && values.scheduledAt ? values.scheduledAt : undefined,
+      }),
     onSuccess: (data) => {
-      toast.success(`Token #${data.tokenNumber} issued for ${data.patientName}`)
+      const msg = data.scheduledAt
+        ? `Scheduled for ${new Date(data.scheduledAt).toLocaleString()}`
+        : `Token #${data.tokenNumber} issued for ${data.patientName}`
+      toast.success(msg)
       qc.invalidateQueries({ queryKey: ['appointments'] })
       handleClose()
     },
@@ -57,6 +66,7 @@ export default function BookAppointmentModal({ open, onClose }) {
   const handleClose = () => {
     reset()
     setPatient(null)
+    setScheduled(false)
     setTerm('')
     setQuery('')
     onClose()
@@ -145,6 +155,17 @@ export default function BookAppointmentModal({ open, onClose }) {
             <option value="UPI">UPI</option>
             <option value="CARD">Card</option>
           </Select>
+        </div>
+
+        <div>
+          <label className="flex items-center gap-2 text-sm text-slate-700">
+            <input type="checkbox" className="h-4 w-4 rounded border-slate-300"
+              checked={scheduled} onChange={(e) => setScheduled(e.target.checked)} />
+            Schedule for a later date/time
+          </label>
+          {scheduled && (
+            <Input type="datetime-local" className="mt-2 max-w-xs" {...register('scheduledAt')} />
+          )}
         </div>
 
         <div className="flex justify-end gap-2 pt-2">

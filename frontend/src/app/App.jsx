@@ -22,6 +22,7 @@ import BillingPage from '../features/billing/BillingPage'
 import StaffPage from '../features/staff/StaffPage'
 import ClinicSettingsPage from '../features/clinic/ClinicSettingsPage'
 import AuditPage from '../features/audit/AuditPage'
+import ReportsPage from '../features/reports/ReportsPage'
 
 export default function App() {
   return (
@@ -87,6 +88,14 @@ export default function App() {
           element={
             <RoleRoute roles={[ROLES.ADMIN]}>
               <AuditPage />
+            </RoleRoute>
+          }
+        />
+        <Route
+          path="/reports"
+          element={
+            <RoleRoute roles={[ROLES.ADMIN]}>
+              <ReportsPage />
             </RoleRoute>
           }
         />

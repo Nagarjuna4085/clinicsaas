@@ -6,4 +6,5 @@ export const bookingSchema = z.object({
   visitType: z.enum(['WALKIN', 'SCHEDULED', 'FOLLOWUP']).default('WALKIN'),
   opFee: z.coerce.number().int().min(0).default(0),
   paymentMode: z.enum(['CASH', 'UPI', 'CARD']).default('CASH'),
+  scheduledAt: z.string().optional(), // ISO date-time for a future booking
 })

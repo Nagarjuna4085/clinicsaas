@@ -41,6 +41,13 @@ public class AppointmentController {
         return ResponseEntity.ok(appointmentService.getAllTodaysAppointments());
     }
 
+    @Operation(summary = "Upcoming scheduled appointments", description = "Future-dated (scheduled) appointments. Roles: RECEPTIONIST, ADMIN, DOCTOR, NURSE.")
+    @GetMapping("/upcoming")
+    @PreAuthorize("hasAnyRole('RECEPTIONIST','ADMIN','DOCTOR','NURSE')")
+    public ResponseEntity<List<AppointmentDto.QueueItem>> upcoming() {
+        return ResponseEntity.ok(appointmentService.getUpcoming());
+    }
+
     @Operation(summary = "Doctor's personal queue", description = "Today's appointments for one doctor, ordered by token. A DOCTOR may only request their own queue; ADMIN/RECEPTIONIST may request any doctor's.")
     @GetMapping("/today/doctor/{doctorId}")
     @PreAuthorize("hasAnyRole('DOCTOR','RECEPTIONIST','ADMIN')")

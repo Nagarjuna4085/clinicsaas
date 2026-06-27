@@ -41,6 +41,9 @@ public class Appointment {
     @Column(name = "followup_date")
     private LocalDate followupDate;
 
+    @Column(name = "scheduled_at")
+    private OffsetDateTime scheduledAt;   // set when booked for a future date/time
+
     @Builder.Default
     @Column(name = "reminder_sent")
     private boolean reminderSent = false;
