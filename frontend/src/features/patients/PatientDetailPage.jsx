@@ -1,9 +1,9 @@
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import { getPatient, exportPatient, erasePatient } from './api'
+import { getPatient, getPatientHistory, exportPatient, erasePatient } from './api'
 import { Card, CardHeader } from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
-import { Badge, CenteredSpinner, ErrorState } from '../../components/ui/Misc'
+import { Badge, CenteredSpinner, EmptyState, ErrorState } from '../../components/ui/Misc'
 import { apiErrorMessage } from '../../lib/apiClient'
 import { useToast } from '../../components/ui/Toast'
 import { useAuthStore } from '../../store/auth'
@@ -27,6 +27,11 @@ export default function PatientDetailPage() {
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ['patients', id],
     queryFn: () => getPatient(id),
+  })
+
+  const history = useQuery({
+    queryKey: ['patients', id, 'history'],
+    queryFn: () => getPatientHistory(id),
   })
 
   const onExport = async () => {
@@ -99,6 +104,48 @@ export default function PatientDetailPage() {
           </>
         )}
       </Card>
+
+      <Card>
+        <CardHeader title="Visit history" subtitle="Past appointments, newest first" />
+        {history.isLoading ? (
+          <CenteredSpinner />
+        ) : history.isError ? (
+          <ErrorState message={apiErrorMessage(history.error)} />
+        ) : !history.data || history.data.length === 0 ? (
+          <EmptyState title="No visits yet" hint="Booked appointments will appear here." />
+        ) : (
+          <ol className="relative ml-3 border-l border-slate-200">
+            {history.data.map((v, i) => (
+              <li key={i} className="mb-5 ml-5">
+                <span className="absolute -left-[7px] mt-1 h-3 w-3 rounded-full border-2 border-white bg-brand-500" />
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-sm font-semibold text-slate-700">{v.visitDate || '—'}</span>
+                  {v.tokenNumber != null && <Badge color="slate">Token {v.tokenNumber}</Badge>}
+                  <Badge color={statusColor[v.status] || 'slate'}>{v.status}</Badge>
+                  {v.visitType && <span className="text-xs text-slate-400">{v.visitType}</span>}
+                </div>
+                <div className="mt-1 text-sm text-slate-600">
+                  {v.doctorName && <span>Dr. {v.doctorName}</span>}
+                  {v.diagnosis && <span> · {v.diagnosis}</span>}
+                  {v.invoiceNumber && (
+                    <span className="text-slate-400">
+                      {' '}· {v.invoiceNumber}
+                      {v.billTotal != null ? ` (₹${Number(v.billTotal).toLocaleString('en-IN')})` : ''}
+                    </span>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ol>
+        )}
+      </Card>
     </div>
   )
+}
+
+const statusColor = {
+  WAITING: 'amber',
+  CONSULTING: 'blue',
+  COMPLETED: 'green',
+  CANCELLED: 'red',
 }

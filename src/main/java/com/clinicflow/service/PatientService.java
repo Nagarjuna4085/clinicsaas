@@ -2,14 +2,17 @@ package com.clinicflow.service;
 
 import com.clinicflow.dto.PatientDto;
 import com.clinicflow.entity.tenant.Patient;
+import com.clinicflow.entity.tenant.Appointment;
 import com.clinicflow.exception.BadRequestException;
 import com.clinicflow.exception.NotFoundException;
 import com.clinicflow.repository.tenant.AppointmentRepository;
 import com.clinicflow.repository.tenant.BillRepository;
+import com.clinicflow.repository.tenant.ConsultationRepository;
 import com.clinicflow.repository.tenant.PatientRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,16 +26,42 @@ public class PatientService {
     private final PatientRepository patientRepo;
     private final AppointmentRepository appointmentRepo;
     private final BillRepository billRepo;
+    private final ConsultationRepository consultationRepo;
     private final AuditService auditService;
 
     public PatientService(PatientRepository patientRepo,
                           AppointmentRepository appointmentRepo,
                           BillRepository billRepo,
+                          ConsultationRepository consultationRepo,
                           AuditService auditService) {
         this.patientRepo = patientRepo;
         this.appointmentRepo = appointmentRepo;
         this.billRepo = billRepo;
+        this.consultationRepo = consultationRepo;
         this.auditService = auditService;
+    }
+
+    /** Chronological visit history for a patient (newest first). */
+    @Transactional(readOnly = true)
+    public List<PatientDto.Visit> history(UUID id) {
+        if (!patientRepo.existsById(id)) {
+            throw new NotFoundException("Patient not found: " + id);
+        }
+        List<Appointment> appts = appointmentRepo.findByPatientIdOrderByVisitDateDesc(id);
+        List<PatientDto.Visit> visits = new ArrayList<>();
+        for (Appointment a : appts) {
+            String doctor = a.getDoctor() != null ? a.getDoctor().getName() : null;
+            String diagnosis = consultationRepo.findByAppointmentId(a.getId())
+                .map(c -> c.getDiagnosis()).orElse(null);
+            var bill = billRepo.findByAppointmentId(a.getId()).stream().findFirst().orElse(null);
+            visits.add(new PatientDto.Visit(
+                a.getVisitDate() != null ? a.getVisitDate().toString() : null,
+                a.getTokenNumber(), a.getStatus(), a.getVisitType(), doctor, diagnosis,
+                bill != null ? bill.getInvoiceNumber() : null,
+                bill != null ? bill.getTotal() : null));
+        }
+        auditService.log("VIEW", "PATIENT_HISTORY", id.toString(), null);
+        return visits;
     }
 
     @Transactional

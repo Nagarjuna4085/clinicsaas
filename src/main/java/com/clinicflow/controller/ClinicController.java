@@ -17,6 +17,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import java.util.Map;
 
 /**
  * Public self-service clinic onboarding.
@@ -50,6 +51,13 @@ public class ClinicController {
         this.passwordEncoder = passwordEncoder;
     }
 
+    @Operation(summary = "Check phone availability", description = "Returns whether a phone is free to register a new clinic (not already used by any clinic). Call this before sending the signup OTP.")
+    @GetMapping("/phone-available")
+    public ResponseEntity<Map<String, Boolean>> phoneAvailable(@RequestParam String phone) {
+        boolean available = directoryRepo.findByPhone(phone).isEmpty();
+        return ResponseEntity.ok(Map.of("available", available));
+    }
+
     @Operation(summary = "Register a new clinic", description = "Verifies the one-time OTP for the owner phone, provisions a dedicated schema, runs migrations, and creates the owner staff with the chosen password. Call POST /api/auth/send-otp first to get the OTP.")
     @PostMapping("/register")
     public ResponseEntity<ClinicDto.RegisterResponse> register(
@@ -66,6 +74,13 @@ public class ClinicController {
             throw new BadRequestException("Invalid or expired OTP");
         }
         otpStore.remove(req.ownerPhone());
+
+        // 0c. A phone can belong to only one clinic. Reject if it's already in
+        //     use anywhere (as an owner or staff) — otherwise we'd silently
+        //     hijack that person's login from their existing clinic.
+        if (directoryRepo.findByPhone(req.ownerPhone()).isPresent()) {
+            throw new BadRequestException("This phone is already registered with a clinic. Please use a different number.");
+        }
 
         // 1. Provision schema + run tenant migrations + save global.tenants row
         Tenant tenant = provisioningService.provisionNewClinic(

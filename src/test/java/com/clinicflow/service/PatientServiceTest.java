@@ -25,8 +25,9 @@ class PatientServiceTest {
         patientRepo = mock(PatientRepository.class);
         appointmentRepo = mock(AppointmentRepository.class);
         billRepo = mock(BillRepository.class);
+        var consultationRepo = mock(com.clinicflow.repository.tenant.ConsultationRepository.class);
         var audit = mock(com.clinicflow.service.AuditService.class);
-        service = new PatientService(patientRepo, appointmentRepo, billRepo, audit);
+        service = new PatientService(patientRepo, appointmentRepo, billRepo, consultationRepo, audit);
         when(appointmentRepo.findByPatientIdOrderByVisitDateDesc(any())).thenReturn(List.of());
         when(patientRepo.save(any())).thenAnswer(i -> i.getArgument(0));
     }

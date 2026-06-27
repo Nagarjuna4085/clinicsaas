@@ -4,6 +4,10 @@ import api from '../../lib/apiClient'
 export const sendOtp = (phone) =>
   api.post('/api/auth/send-otp', { phone }).then((r) => r.data)
 
+// Check a phone is free before starting signup OTP
+export const checkPhoneAvailable = (phone) =>
+  api.get('/api/public/clinics/phone-available', { params: { phone } }).then((r) => r.data)
+
 // Clinic signup (requires OTP + owner password)
 export const registerClinic = (payload) =>
   api.post('/api/public/clinics/register', payload).then((r) => r.data)

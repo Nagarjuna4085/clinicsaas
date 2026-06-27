@@ -1,9 +1,21 @@
 package com.clinicflow.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import java.math.BigDecimal;
 import java.util.UUID;
 
 public class PatientDto {
+
+    public record Visit(
+        String visitDate,
+        Short tokenNumber,
+        String status,
+        String visitType,
+        String doctorName,
+        String diagnosis,
+        String invoiceNumber,
+        BigDecimal billTotal
+    ) {}
 
     public record RegisterRequest(
         @NotBlank String name,

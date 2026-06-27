@@ -27,4 +27,5 @@ public interface BillRepository extends JpaRepository<Bill, UUID> {
     long nextInvoiceSeq();
 
     List<Bill> findByPatientId(UUID patientId);
+    List<Bill> findByAppointmentId(UUID appointmentId);
 }

@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation } from '@tanstack/react-query'
 import { Link, useNavigate } from 'react-router-dom'
-import { registerClinic, sendOtp } from './api'
+import { registerClinic, sendOtp, checkPhoneAvailable } from './api'
 import { signupDetailsSchema, signupVerifySchema } from './schemas'
 import { apiErrorMessage } from '../../lib/apiClient'
 import { useToast } from '../../components/ui/Toast'
@@ -24,7 +24,14 @@ export default function SignupPage() {
   const alsoDoctor = detailsForm.watch('alsoDoctor')
 
   const otpMutation = useMutation({
-    mutationFn: (values) => sendOtp(values.ownerPhone),
+    mutationFn: async (values) => {
+      // Fail fast if the phone is already tied to a clinic — before wasting an OTP.
+      const { available } = await checkPhoneAvailable(values.ownerPhone)
+      if (!available) {
+        throw new Error('This phone is already registered with a clinic. Please use a different number.')
+      }
+      return sendOtp(values.ownerPhone)
+    },
     onSuccess: (data, values) => {
       setDetails(values)
       verifyForm.reset({ otp: data?.devOtp || '', password: '' })

@@ -62,6 +62,13 @@ public class PatientController {
         return ResponseEntity.ok(patientService.getById(id));
     }
 
+    @Operation(summary = "Patient visit history", description = "Chronological visits (date, status, doctor, diagnosis, bill). Roles: RECEPTIONIST, ADMIN, DOCTOR, NURSE.")
+    @GetMapping("/{id}/history")
+    @PreAuthorize("hasAnyRole('RECEPTIONIST','ADMIN','DOCTOR','NURSE')")
+    public ResponseEntity<List<PatientDto.Visit>> history(@PathVariable UUID id) {
+        return ResponseEntity.ok(patientService.history(id));
+    }
+
     @Operation(summary = "Export patient data (DPDP)", description = "Returns the patient's full data bundle (profile, visits, bills). Role: ADMIN.")
     @GetMapping("/{id}/export")
     @PreAuthorize("hasRole('ADMIN')")

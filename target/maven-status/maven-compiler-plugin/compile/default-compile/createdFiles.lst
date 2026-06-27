@@ -72,6 +72,7 @@ com/clinicflow/config/HibernateConfig.class
 com/clinicflow/entity/tenant/Staff$StaffBuilder.class
 com/clinicflow/dto/AppointmentDto$QueueItem.class
 com/clinicflow/repository/global/StaffDirectoryRepository.class
+com/clinicflow/dto/PatientDto$Visit.class
 com/clinicflow/dto/VitalsDto$Response.class
 com/clinicflow/dto/AuthDto$SetPasswordRequest.class
 com/clinicflow/controller/AuditController.class
