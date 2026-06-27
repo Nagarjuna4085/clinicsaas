@@ -5,6 +5,8 @@ import com.clinicflow.entity.tenant.Appointment;
 import com.clinicflow.entity.tenant.Bill;
 import com.clinicflow.repository.tenant.AppointmentRepository;
 import com.clinicflow.repository.tenant.BillRepository;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
@@ -48,8 +50,18 @@ public class DashboardService {
         int waiting = (int) appts.stream()
             .filter(a -> "WAITING".equals(a.getStatus())).count();
 
+        // Financials are visible to ADMIN only; other roles get null money fields.
+        if (!isAdmin()) {
+            return new BillDto.DashboardSummary(null, 0, null, null, null, patientsToday, waiting);
+        }
         return new BillDto.DashboardSummary(
             total, bills.size(), cash, upi, card, patientsToday, waiting);
+    }
+
+    private static boolean isAdmin() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return auth != null && auth.getAuthorities().stream()
+            .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
     }
 
     private static BigDecimal nz(BigDecimal v) {

@@ -6,6 +6,7 @@ import { Card } from '../../components/ui/Card'
 import { CenteredSpinner, ErrorState } from '../../components/ui/Misc'
 import { apiErrorMessage } from '../../lib/apiClient'
 import { useAuthStore } from '../../store/auth'
+import { ROLES } from '../../lib/constants'
 
 const inr = (n) => `₹${Number(n ?? 0).toLocaleString('en-IN')}`
 
@@ -18,16 +19,24 @@ function Stat({ label, value, accent = 'text-slate-800' }) {
   )
 }
 
-// Metrics now come from the real /api/dashboard/summary endpoint; team counts
-// come from /api/staff.
 export default function DashboardPage() {
-  const { name, clinic } = useAuthStore()
+  const { name, clinic, role } = useAuthStore()
+  const isAdmin = role === ROLES.ADMIN
 
   const summary = useQuery({ queryKey: ['dashboard', 'summary'], queryFn: getDashboardSummary })
-  const staff = useQuery({ queryKey: ['staff'], queryFn: listStaff })
+  // Team counts are an admin-only concern, so only fetch staff for admins.
+  const staff = useQuery({ queryKey: ['staff'], queryFn: listStaff, enabled: isAdmin })
 
   const s = summary.data
   const doctors = (staff.data || []).filter((x) => x.role === 'DOCTOR').length
+
+  // Quick links tailored to the role.
+  const links = [
+    { to: '/appointments', title: "Today's queue", hint: 'Tokens & consultations', roles: 'all' },
+    { to: '/patients', title: 'Patients', hint: 'Register & search', roles: 'all' },
+    { to: '/billing', title: 'Billing', hint: 'Invoices & revenue', roles: [ROLES.ADMIN, ROLES.RECEPTIONIST] },
+    { to: '/staff', title: 'Staff', hint: 'Manage your team', roles: [ROLES.ADMIN] },
+  ].filter((l) => l.roles === 'all' || l.roles.includes(role))
 
   return (
     <div className="space-y-6">
@@ -42,34 +51,39 @@ export default function DashboardPage() {
         <ErrorState message={apiErrorMessage(summary.error)} />
       ) : (
         <>
+          {/* Everyone sees the operational metrics */}
           <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-            <Stat label="Revenue today" value={inr(s.totalRevenue)} accent="text-green-600" />
-            <Stat label="Bills today" value={s.billCount} accent="text-brand-700" />
             <Stat label="Patients today" value={s.patientsToday} accent="text-blue-600" />
             <Stat label="Waiting now" value={s.waitingCount} accent="text-amber-600" />
+            {isAdmin && <Stat label="Revenue today" value={inr(s.totalRevenue)} accent="text-green-600" />}
+            {isAdmin && <Stat label="Bills today" value={s.billCount} accent="text-brand-700" />}
           </div>
 
-          <Card>
-            <p className="mb-3 text-sm font-medium text-slate-600">Payments by mode (today)</p>
-            <div className="grid grid-cols-3 gap-4">
-              <Split label="Cash" value={inr(s.cashTotal)} />
-              <Split label="UPI" value={inr(s.upiTotal)} />
-              <Split label="Card" value={inr(s.cardTotal)} />
-            </div>
-          </Card>
+          {/* Financial detail — admin only */}
+          {isAdmin && (
+            <>
+              <Card>
+                <p className="mb-3 text-sm font-medium text-slate-600">Payments by mode (today)</p>
+                <div className="grid grid-cols-3 gap-4">
+                  <Split label="Cash" value={inr(s.cashTotal)} />
+                  <Split label="UPI" value={inr(s.upiTotal)} />
+                  <Split label="Card" value={inr(s.cardTotal)} />
+                </div>
+              </Card>
 
-          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-            <Stat label="Total staff" value={staff.data?.length ?? 0} />
-            <Stat label="Doctors" value={doctors} />
-          </div>
+              <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+                <Stat label="Total staff" value={staff.data?.length ?? 0} />
+                <Stat label="Doctors" value={doctors} />
+              </div>
+            </>
+          )}
         </>
       )}
 
       <div className="grid gap-4 sm:grid-cols-4">
-        <QuickLink to="/appointments" title="Today's queue" hint="Tokens & consultations" />
-        <QuickLink to="/patients" title="Patients" hint="Register & search" />
-        <QuickLink to="/billing" title="Billing" hint="Invoices & revenue" />
-        <QuickLink to="/staff" title="Staff" hint="Manage your team" />
+        {links.map((l) => (
+          <QuickLink key={l.to} to={l.to} title={l.title} hint={l.hint} />
+        ))}
       </div>
     </div>
   )
