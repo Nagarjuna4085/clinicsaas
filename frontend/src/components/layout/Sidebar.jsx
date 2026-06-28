@@ -2,12 +2,12 @@ import { NavLink } from 'react-router-dom'
 import { NAV_ITEMS } from '../../lib/constants'
 import { useAuthStore } from '../../store/auth'
 
-export default function Sidebar() {
+function NavContent({ onNavigate }) {
   const role = useAuthStore((s) => s.role)
   const items = NAV_ITEMS.filter((i) => i.roles.includes(role))
 
   return (
-    <aside className="hidden w-60 shrink-0 border-r border-slate-200 bg-white md:block">
+    <>
       <div className="flex h-16 items-center gap-2 border-b border-slate-200 px-6">
         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-600 font-bold text-white">
           C
@@ -20,6 +20,7 @@ export default function Sidebar() {
             key={item.to}
             to={item.to}
             end={item.to === '/'}
+            onClick={onNavigate}
             className={({ isActive }) =>
               `rounded-lg px-3 py-2 text-sm font-medium transition ${
                 isActive
@@ -32,6 +33,31 @@ export default function Sidebar() {
           </NavLink>
         ))}
       </nav>
-    </aside>
+    </>
+  )
+}
+
+export default function Sidebar({ open, onClose }) {
+  return (
+    <>
+      {/* Desktop: static sidebar */}
+      <aside className="hidden w-60 shrink-0 border-r border-slate-200 bg-white md:block">
+        <NavContent />
+      </aside>
+
+      {/* Mobile: slide-in drawer with backdrop */}
+      {open && (
+        <div className="fixed inset-0 z-40 md:hidden">
+          <div
+            className="absolute inset-0 bg-slate-900/40"
+            onClick={onClose}
+            aria-hidden="true"
+          />
+          <aside className="absolute left-0 top-0 h-full w-60 bg-white shadow-xl">
+            <NavContent onNavigate={onClose} />
+          </aside>
+        </div>
+      )}
+    </>
   )
 }
