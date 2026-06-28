@@ -147,7 +147,7 @@ export default function BookAppointmentModal({ open, onClose }) {
           </p>
         )}
 
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
           <Select label="Visit type" {...register('visitType')}>
             <option value="WALKIN">Walk-in</option>
             <option value="SCHEDULED">Scheduled</option>

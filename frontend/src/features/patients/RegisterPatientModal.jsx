@@ -39,8 +39,8 @@ export default function RegisterPatientModal({ open, onClose, onCreated }) {
 
   return (
     <Modal open={open} onClose={onClose} title="Register patient">
-      <form onSubmit={handleSubmit((v) => mutation.mutate(v))} className="grid grid-cols-2 gap-4">
-        <div className="col-span-2">
+      <form onSubmit={handleSubmit((v) => mutation.mutate(v))} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="sm:col-span-2">
           <Input label="Full name" error={errors.name?.message} {...register('name')} />
         </div>
         <Input label="Phone" maxLength={10} error={errors.phone?.message} {...register('phone')} />
@@ -53,17 +53,17 @@ export default function RegisterPatientModal({ open, onClose, onCreated }) {
         </Select>
         <Input label="Blood group" error={errors.bloodGroup?.message} {...register('bloodGroup')} />
         <Input label="ABHA ID" error={errors.abhaId?.message} {...register('abhaId')} />
-        <div className="col-span-2">
+        <div className="sm:col-span-2">
           <Input label="Allergies" error={errors.allergies?.message} {...register('allergies')} />
         </div>
-        <div className="col-span-2">
+        <div className="sm:col-span-2">
           <label className="flex items-start gap-2 text-sm text-slate-700">
             <input type="checkbox" className="mt-0.5 h-4 w-4 rounded border-slate-300" {...register('consent')} />
             <span>Patient consents to storing their health information for treatment and records.</span>
           </label>
           {errors.consent && <p className="mt-1 text-xs text-red-600">{errors.consent.message}</p>}
         </div>
-        <div className="col-span-2 flex justify-end gap-2 pt-2">
+        <div className="flex justify-end gap-2 pt-2 sm:col-span-2">
           <Button variant="secondary" onClick={onClose}>
             Cancel
           </Button>
