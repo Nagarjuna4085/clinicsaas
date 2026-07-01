@@ -114,7 +114,7 @@ public class AppointmentService {
     @Transactional
     public AppointmentDto.QueueItem updateStatus(UUID id, String status) {
         Appointment appt = appointmentRepo.findById(id)
-            .orElseThrow(() -> new RuntimeException("Appointment not found"));
+            .orElseThrow(() -> new NotFoundException("Appointment not found"));
         appt.setStatus(status);
         return toQueueItem(appointmentRepo.save(appt));
     }

@@ -19,7 +19,7 @@ function NavContent({ onNavigate }) {
           <NavLink
             key={item.to}
             to={item.to}
-            end={item.to === '/'}
+            end={item.to === '/dashboard'}
             onClick={onNavigate}
             className={({ isActive }) =>
               `rounded-lg px-3 py-2 text-sm font-medium transition ${

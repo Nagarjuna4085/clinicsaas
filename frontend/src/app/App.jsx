@@ -3,7 +3,9 @@ import ProtectedRoute from '../routes/ProtectedRoute'
 import RoleRoute from '../routes/RoleRoute'
 import AppShell from '../components/layout/AppShell'
 import { ROLES } from '../lib/constants'
+import { useAuthStore } from '../store/auth'
 
+import LandingPage from '../features/marketing/LandingPage'
 import LoginPage from '../features/auth/LoginPage'
 import SignupPage from '../features/auth/SignupPage'
 import ForgotPasswordPage from '../features/auth/ForgotPasswordPage'
@@ -24,9 +26,18 @@ import ClinicSettingsPage from '../features/clinic/ClinicSettingsPage'
 import AuditPage from '../features/audit/AuditPage'
 import ReportsPage from '../features/reports/ReportsPage'
 
+// Root: logged-in users go to the dashboard; everyone else sees the landing page.
+function RootGate() {
+  const token = useAuthStore((s) => s.token)
+  return token ? <Navigate to="/dashboard" replace /> : <LandingPage />
+}
+
 export default function App() {
   return (
     <Routes>
+      {/* Public marketing landing (or redirect to app if signed in) */}
+      <Route path="/" element={<RootGate />} />
+
       {/* Public */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
@@ -47,7 +58,7 @@ export default function App() {
           </ProtectedRoute>
         }
       >
-        <Route index element={<DashboardPage />} />
+        <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/appointments" element={<AppointmentsPage />} />
         <Route
           path="/appointments/:id/consult"

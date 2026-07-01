@@ -5,7 +5,7 @@ import { useAuthStore } from '../store/auth'
 export default function RoleRoute({ roles, children }) {
   const role = useAuthStore((s) => s.role)
   if (!roles.includes(role)) {
-    return <Navigate to="/" replace />
+    return <Navigate to="/dashboard" replace />
   }
   return children
 }

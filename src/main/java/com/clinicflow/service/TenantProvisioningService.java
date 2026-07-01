@@ -1,6 +1,7 @@
 package com.clinicflow.service;
 
 import com.clinicflow.entity.global.Tenant;
+import com.clinicflow.exception.BadRequestException;
 import com.clinicflow.repository.global.TenantRepository;
 import org.flywaydb.core.Flyway;
 import org.springframework.stereotype.Service;
@@ -35,7 +36,7 @@ public class TenantProvisioningService {
         String schemaName = generateSchemaName(ownerPhone);
 
         if (tenantRepository.existsBySchemaName(schemaName)) {
-            throw new RuntimeException("Clinic already registered with this phone");
+            throw new BadRequestException("Clinic already registered with this phone");
         }
 
         // 2. Create PostgreSQL schema

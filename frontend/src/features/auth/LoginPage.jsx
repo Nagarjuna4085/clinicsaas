@@ -32,7 +32,7 @@ export default function LoginPage() {
       } else {
         setAuth(data)
         toast.success(`Welcome, ${data.name}`)
-        navigate('/', { replace: true })
+        navigate('/dashboard', { replace: true })
       }
     },
     onError: (e) => toast.error(apiErrorMessage(e, 'Login failed')),

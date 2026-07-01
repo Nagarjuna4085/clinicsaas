@@ -3,6 +3,7 @@ package com.clinicflow.service;
 import com.clinicflow.context.TenantContext;
 import com.clinicflow.dto.ClinicDto;
 import com.clinicflow.entity.global.Tenant;
+import com.clinicflow.exception.NotFoundException;
 import com.clinicflow.repository.global.TenantRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,7 +34,7 @@ public class ClinicService {
     private Tenant current() {
         String schema = TenantContext.get();
         return tenantRepo.findBySchemaName(schema)
-            .orElseThrow(() -> new RuntimeException("Clinic not found"));
+            .orElseThrow(() -> new NotFoundException("Clinic not found"));
     }
 
     private ClinicDto.Profile toProfile(Tenant t) {

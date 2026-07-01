@@ -7,6 +7,7 @@ import com.clinicflow.entity.tenant.Appointment;
 import com.clinicflow.entity.tenant.Consultation;
 import com.clinicflow.entity.tenant.Prescription;
 import com.clinicflow.entity.tenant.PrescriptionItem;
+import com.clinicflow.exception.NotFoundException;
 import com.clinicflow.repository.global.TenantRepository;
 import com.clinicflow.repository.tenant.AppointmentRepository;
 import com.clinicflow.repository.tenant.ConsultationRepository;
@@ -47,7 +48,7 @@ public class PrescriptionService {
     @Transactional
     public PrescriptionDto.Response sendWhatsapp(UUID appointmentId) {
         Prescription p = prescriptionRepo.findByAppointmentId(appointmentId)
-            .orElseThrow(() -> new RuntimeException("No prescription for this appointment"));
+            .orElseThrow(() -> new NotFoundException("No prescription for this appointment"));
         Appointment appt = p.getAppointment();
         String phone = appt != null && appt.getPatient() != null ? appt.getPatient().getPhone() : null;
         String name = appt != null && appt.getPatient() != null ? appt.getPatient().getName() : "";
@@ -67,7 +68,7 @@ public class PrescriptionService {
     @Transactional(readOnly = true)
     public byte[] pdf(UUID appointmentId) {
         Prescription p = prescriptionRepo.findByAppointmentId(appointmentId)
-            .orElseThrow(() -> new RuntimeException("No prescription for this appointment"));
+            .orElseThrow(() -> new NotFoundException("No prescription for this appointment"));
         Consultation c = consultationRepo.findByAppointmentId(appointmentId).orElse(null);
         Appointment appt = p.getAppointment();
         String doctorName = appt != null && appt.getDoctor() != null ? appt.getDoctor().getName() : null;
@@ -101,7 +102,7 @@ public class PrescriptionService {
     @Transactional
     public PrescriptionDto.Response create(PrescriptionDto.CreateRequest req) {
         Appointment appt = appointmentRepo.findById(req.appointmentId())
-            .orElseThrow(() -> new RuntimeException("Appointment not found"));
+            .orElseThrow(() -> new NotFoundException("Appointment not found"));
 
         // Consultation notes (upsert)
         Consultation c = consultationRepo.findByAppointmentId(req.appointmentId())

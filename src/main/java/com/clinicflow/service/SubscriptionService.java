@@ -3,6 +3,7 @@ package com.clinicflow.service;
 import com.clinicflow.context.TenantContext;
 import com.clinicflow.dto.SubscriptionDto;
 import com.clinicflow.entity.global.Tenant;
+import com.clinicflow.exception.NotFoundException;
 import com.clinicflow.repository.global.TenantRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -119,6 +120,6 @@ public class SubscriptionService {
     private Tenant current() {
         String schema = TenantContext.get();
         return tenantRepo.findBySchemaName(schema)
-            .orElseThrow(() -> new RuntimeException("Clinic not found"));
+            .orElseThrow(() -> new NotFoundException("Clinic not found"));
     }
 }

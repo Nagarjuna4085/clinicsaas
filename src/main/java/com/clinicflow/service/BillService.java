@@ -4,6 +4,7 @@ import com.clinicflow.context.TenantContext;
 import com.clinicflow.dto.BillDto;
 import com.clinicflow.entity.global.Tenant;
 import com.clinicflow.entity.tenant.Bill;
+import com.clinicflow.exception.NotFoundException;
 import com.clinicflow.repository.global.TenantRepository;
 import com.clinicflow.repository.tenant.BillRepository;
 import org.springframework.stereotype.Service;
@@ -30,7 +31,7 @@ public class BillService {
     @Transactional(readOnly = true)
     public byte[] pdf(UUID id) {
         Bill b = billRepo.findById(id)
-            .orElseThrow(() -> new RuntimeException("Bill not found: " + id));
+            .orElseThrow(() -> new NotFoundException("Bill not found: " + id));
         List<PdfService.BillLine> lines = b.getItems().stream()
             .map(i -> new PdfService.BillLine(i.getDescription(), i.getHsnSac(), i.getAmount()))
             .collect(Collectors.toList());
@@ -58,7 +59,7 @@ public class BillService {
     @Transactional(readOnly = true)
     public BillDto.Response get(UUID id) {
         Bill bill = billRepo.findById(id)
-            .orElseThrow(() -> new RuntimeException("Bill not found: " + id));
+            .orElseThrow(() -> new NotFoundException("Bill not found: " + id));
         return toResponse(bill);
     }
 

@@ -4,6 +4,7 @@ import com.clinicflow.dto.VitalsDto;
 import com.clinicflow.entity.tenant.Appointment;
 import com.clinicflow.entity.tenant.Staff;
 import com.clinicflow.entity.tenant.Vitals;
+import com.clinicflow.exception.NotFoundException;
 import com.clinicflow.repository.tenant.AppointmentRepository;
 import com.clinicflow.repository.tenant.StaffRepository;
 import com.clinicflow.repository.tenant.VitalsRepository;
@@ -32,7 +33,7 @@ public class VitalsService {
     @Transactional
     public VitalsDto.Response record(VitalsDto.CreateRequest req) {
         Appointment appt = appointmentRepo.findById(req.appointmentId())
-            .orElseThrow(() -> new RuntimeException("Appointment not found"));
+            .orElseThrow(() -> new NotFoundException("Appointment not found"));
 
         Vitals v = vitalsRepo.findByAppointmentId(req.appointmentId())
             .orElseGet(() -> Vitals.builder().appointment(appt).build());
